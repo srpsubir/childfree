@@ -68,7 +68,7 @@ const Index = () => {
           <PulseScreen onNext={() => goTo("outcome")} />
         )}
         {screen === "outcome" && (
-          <OutcomeScreen handle={handle} why={why} pillar={pillar} />
+          <OutcomeScreen handle={handle} why={why} pillar={pillar} filters={filters} stack={stack} />
         )}
       </div>
     </div>
