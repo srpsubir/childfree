@@ -3,17 +3,21 @@ import AuditScreen from "@/components/screens/AuditScreen";
 import OTPScreen from "@/components/screens/OTPScreen";
 import WhyScreen from "@/components/screens/WhyScreen";
 import PillarScreen from "@/components/screens/PillarScreen";
+import FilterScreen from "@/components/screens/FilterScreen";
+import StackScreen from "@/components/screens/StackScreen";
 import PledgeScreen from "@/components/screens/PledgeScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
-type Screen = "audit" | "otp" | "why" | "pillar" | "pledge" | "pulse" | "outcome";
+type Screen = "audit" | "otp" | "why" | "pillar" | "filter" | "stack" | "pledge" | "pulse" | "outcome";
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("audit");
   const [handle, setHandle] = useState("");
   const [why, setWhy] = useState("");
   const [pillar, setPillar] = useState("");
+  const [filters, setFilters] = useState<string[]>([]);
+  const [stack, setStack] = useState<[string, string, string]>(["", "", ""]);
   const [fadeKey, setFadeKey] = useState(0);
 
   const goTo = useCallback((s: Screen) => {
@@ -34,7 +38,13 @@ const Index = () => {
           <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} />
         )}
         {screen === "pillar" && (
-          <PillarScreen onNext={(p) => { setPillar(p); goTo("pledge"); }} />
+          <PillarScreen onNext={(p) => { setPillar(p); goTo("filter"); }} />
+        )}
+        {screen === "filter" && (
+          <FilterScreen onNext={(f) => { setFilters(f); goTo("stack"); }} />
+        )}
+        {screen === "stack" && (
+          <StackScreen onNext={(s) => { setStack(s); goTo("pledge"); }} />
         )}
         {screen === "pledge" && (
           <PledgeScreen onNext={() => goTo("pulse")} />
