@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import LandingScreen from "@/components/screens/LandingScreen";
 import AuditScreen from "@/components/screens/AuditScreen";
 import OTPScreen from "@/components/screens/OTPScreen";
 import WhyScreen from "@/components/screens/WhyScreen";
@@ -9,7 +10,7 @@ import PledgeScreen from "@/components/screens/PledgeScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
-type Screen = "audit" | "otp" | "why" | "pillar" | "filter" | "stack" | "pledge" | "pulse" | "outcome";
+type Screen = "landing" | "audit" | "otp" | "why" | "pillar" | "filter" | "stack" | "pledge" | "pulse" | "outcome";
 
 const BackButton = ({ onClick }: { onClick: () => void }) => (
   <button
@@ -21,7 +22,7 @@ const BackButton = ({ onClick }: { onClick: () => void }) => (
 );
 
 const Index = () => {
-  const [screen, setScreen] = useState<Screen>("audit");
+  const [screen, setScreen] = useState<Screen>("landing");
   const [handle, setHandle] = useState("");
   const [why, setWhy] = useState("");
   const [pillar, setPillar] = useState("");
@@ -37,8 +38,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div key={fadeKey} className="screen-fade">
+        {screen === "landing" && (
+          <LandingScreen onNext={() => goTo("audit")} />
+        )}
         {screen === "audit" && (
-          <AuditScreen onNext={(h) => { setHandle(h); goTo("otp"); }} />
+          <><BackButton onClick={() => goTo("landing")} />
+          <AuditScreen onNext={(h) => { setHandle(h); goTo("otp"); }} /></>
         )}
         {screen === "otp" && (
           <><BackButton onClick={() => goTo("audit")} />

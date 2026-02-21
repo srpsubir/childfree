@@ -46,6 +46,11 @@ const PulseScreen = ({ onNext }: Props) => {
           {messages[phase]}
         </p>
         <p className="gallery-label">Kindred verification in progress</p>
+        {phase === 2 && (
+          <p className="gallery-body text-sm text-muted-foreground/70 mt-4 transition-opacity duration-700 animate-fade-up">
+            Preparing your Table — a private circle of people matched to your conviction and values.
+          </p>
+        )}
       </div>
     </div>
   );
