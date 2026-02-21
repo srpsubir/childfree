@@ -35,7 +35,7 @@ const PledgeScreen = ({ onNext }: Props) => {
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-lg space-y-16 animate-fade-up text-center">
         <div className="space-y-6">
-          <p className="gallery-label">The Pledge</p>
+          <p className="gallery-label">The Kindred Pledge</p>
           <h2 className="gallery-heading text-3xl md:text-4xl font-semibold text-foreground leading-tight">
             I Am Certain.
           </h2>
