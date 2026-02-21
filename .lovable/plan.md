@@ -1,49 +1,41 @@
 
 
-## Add Back: "Why Are You Childfree?"
+## Rebrand to "Kindred" + Fix Step Labels
 
-We removed the original pillar selection (Truth, Autonomy, Legacy) and replaced it entirely with partner-preference questions. But the "why" behind someone's childfree choice is a core identity signal -- it's what makes Kindred's matching meaningful.
+Update all screen copy to use "Kindred" as the brand name, replacing any "Certainty Archive" references, and fix the step numbering so Why = Step II and Pillar = Step III.
 
-### Approach
+### Changes by file
 
-Add a **new screen between Audit and the current Pillar screen** that asks users directly why they are childfree. The current Pillar screen (partner values) stays as-is.
+**AuditScreen.tsx** -- Already says "Kindred", no changes needed. The landing screen is good as-is.
 
-**New Screen: "The Why"**
+**WhyScreen.tsx**
+- Step label stays "Step II" (correct position)
+- No other changes needed
 
-Header: **"Why are you childfree?"**
-Sub: **"No wrong answers. This is about your truth."**
+**PillarScreen.tsx**
+- Change step label from "Step II" to "Step III"
 
-Three options:
+**PledgeScreen.tsx**
+- Change label from "The Pledge" to "The Kindred Pledge"
+- Body copy stays the same (already strong)
 
-| Option | Title | Description |
-|--------|-------|-------------|
-| 1 | **By Design** | "I've always known. Kids were never part of my plan." |
-| 2 | **By Realisation** | "I came to it over time. The more I lived, the clearer it became." |
-| 3 | **By Priority** | "I chose freedom, career, or purpose -- and parenthood doesn't fit." |
+**PulseScreen.tsx**
+- Update cycling messages to reference Kindred:
+  - "Checking your profile..." stays
+  - "Matching you with verified childfree singles..." stays
+  - "Reserving your seat at the table." stays
+- Change footer label from "Verification in progress" to "Kindred verification in progress"
 
-Button: **"Continue"**
+**RevealScreen.tsx**
+- Change subtitle label from "You're Verified" to "Kindred Verified"
 
-This value gets stored and displayed on the Ledger screen as a new row (e.g., "Why: By Design").
+**LedgerScreen.tsx**
+- Change label from "Membership Ledger" to "Kindred Ledger"
+- Change heading from "Welcome, Architect." to "Welcome to Kindred."
+- Change table name display to "The Kindred Table — Berlin"
 
-### Flow order update
-
-The onboarding becomes 7 steps:
-1. Audit (handle input)
-2. **Why (new -- why childfree)**
-3. Pillar (what you value in a partner)
-4. Pledge (hold to confirm)
-5. Pulse (verification animation)
-6. Reveal (table assignment)
-7. Ledger (summary)
-
-### Technical details
-
-**New file:**
-- `src/components/screens/WhyScreen.tsx` -- new screen component, same card-selection pattern as PillarScreen
-
-**Files to modify:**
-- `src/pages/Index.tsx` -- add "why" step to the flow state, pass the "why" value through to Ledger
-- `src/components/screens/LedgerScreen.tsx` -- add a "Why" row displaying the user's selection
-
-No new dependencies.
+### What stays the same
+- All screen layouts, animations, and interaction logic unchanged
+- Color system, typography, and design tokens unchanged
+- The "Kindred" title on the Audit landing screen already exists
 
