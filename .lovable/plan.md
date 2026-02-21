@@ -1,71 +1,49 @@
 
 
-## Messaging Overhaul: Clarity on Childfree Dating + In-Person Tables
+## Add Back: "Why Are You Childfree?"
 
-Three core problems to fix:
+We removed the original pillar selection (Truth, Autonomy, Legacy) and replaced it entirely with partner-preference questions. But the "why" behind someone's childfree choice is a core identity signal -- it's what makes Kindred's matching meaningful.
 
-### 1. Screen 1 (Audit) -- Make it clear this is childfree dating
+### Approach
 
-**Current:** "The Certainty Archive" + "Lifestyle Verification" -- too vague.
+Add a **new screen between Audit and the current Pillar screen** that asks users directly why they are childfree. The current Pillar screen (partner values) stays as-is.
 
-**Updated copy:**
-- Tagline changes from "The Certainty Archive" to **"Childfree Dating. Verified."**
-- Sub-label changes from "Lifestyle Verification" to **"We verify you're childfree. Then we seat you at a table."**
-- Bottom text becomes: **"Your handle is your proof of lifestyle. We check it so your dates don't have to."**
+**New Screen: "The Why"**
 
-### 2. Screen 2 (Pillar) -- Reframe as a simple "What matters most to you in dating?"
+Header: **"Why are you childfree?"**
+Sub: **"No wrong answers. This is about your truth."**
 
-**Current:** Abstract pillar names (Truth, Autonomy, Legacy) with manifesto-style descriptions users won't relate to.
-
-**Updated approach -- rename to "What matters most?"** with clear, relatable options:
+Three options:
 
 | Option | Title | Description |
 |--------|-------|-------------|
-| 1 | **Freedom** | "I want a partner who values spontaneity, travel, and living on our own terms." |
-| 2 | **Ambition** | "I want a partner who's building something -- career, craft, or purpose -- without compromise." |
-| 3 | **Connection** | "I want deep partnership. All the intimacy, none of the parenthood." |
+| 1 | **By Design** | "I've always known. Kids were never part of my plan." |
+| 2 | **By Realisation** | "I came to it over time. The more I lived, the clearer it became." |
+| 3 | **By Priority** | "I chose freedom, career, or purpose -- and parenthood doesn't fit." |
 
-Header: **"What do you value most in a partner?"**
-Sub: **"This helps us seat you with the right people."**
-Button: **"Confirm"**
+Button: **"Continue"**
 
-This also introduces the "seating" concept early so it doesn't come out of nowhere later.
+This value gets stored and displayed on the Ledger screen as a new row (e.g., "Why: By Design").
 
-### 3. Screens 3-5 (Pulse, Reveal, Ledger) -- Contextualise the "table" as an in-person dinner date
+### Flow order update
 
-**Pulse screen messages updated to:**
-1. "Checking your profile..." (2s)
-2. "Matching you with verified childfree singles..." (2.5s)
-3. "Reserving your seat at the table." (3s)
+The onboarding becomes 7 steps:
+1. Audit (handle input)
+2. **Why (new -- why childfree)**
+3. Pillar (what you value in a partner)
+4. Pledge (hold to confirm)
+5. Pulse (verification animation)
+6. Reveal (table assignment)
+7. Ledger (summary)
 
-Sub-label: "Verification in progress"
+### Technical details
 
-**Reveal screen updated:**
-- Label: "You're verified"
-- Title stays: "The Mitte Table"
-- Manifesto replaced with a clear explanation: **"You've been matched to an intimate dinner table with 5 other verified childfree singles. Real people. Real conversation. No ambiguity about where they stand."**
-- Below: date/location placeholder -- "Berlin -- Date announced soon"
-- Button stays: "Claim Your Seat"
+**New file:**
+- `src/components/screens/WhyScreen.tsx` -- new screen component, same card-selection pattern as PillarScreen
 
-**Ledger screen updated:**
-- Bottom text changes to: **"Your seat is reserved. We'll notify you when your table date is confirmed."**
-- "Track: Architects" row removed (confusing). Keep Handle, Status (Vetted), Value (the pillar they picked), and Table.
+**Files to modify:**
+- `src/pages/Index.tsx` -- add "why" step to the flow state, pass the "why" value through to Ledger
+- `src/components/screens/LedgerScreen.tsx` -- add a "Why" row displaying the user's selection
 
-### 4. Pledge screen -- minor tweak
+No new dependencies.
 
-Update the pledge text to be more direct:
-**"I confirm: I am childfree by choice. This is not a phase."**
-
----
-
-### Technical summary
-
-Files to modify:
-- `src/components/screens/AuditScreen.tsx` -- updated copy
-- `src/components/screens/PillarScreen.tsx` -- new pillar options, new header/sub copy
-- `src/components/screens/PledgeScreen.tsx` -- updated pledge statement
-- `src/components/screens/PulseScreen.tsx` -- updated phase messages
-- `src/components/screens/RevealScreen.tsx` -- rewritten manifesto card with dinner context
-- `src/components/screens/LedgerScreen.tsx` -- remove "Track" row, update pillar labels, update bottom text
-
-No new files, no new dependencies. Pure copy/content changes across 6 files.
