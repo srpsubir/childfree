@@ -2,6 +2,8 @@ interface Props {
   handle: string;
   why: string;
   pillar: string;
+  filters: string[];
+  stack: [string, string, string];
 }
 
 const pillarLabels: Record<string, string> = {
@@ -16,7 +18,26 @@ const whyLabels: Record<string, string> = {
   priority: "By Priority",
 };
 
-const OutcomeScreen = ({ handle, why, pillar }: Props) => {
+const filterLabels: Record<string, string> = {
+  timeline_pressure: "Timeline pressure",
+  maybe_someday: "'Maybe someday'",
+  friends_disappeared: "Friends disappeared",
+  change_your_mind: "'You'll change your mind'",
+  phase: "Childfree as a phase",
+  workplace_penalty: "Workplace penalty",
+  child_events: "Child-centric events",
+  purpose_parenthood: "Purpose = parenthood",
+};
+
+const stackLabels: Record<string, string> = {
+  freedom: "Freedom",
+  financial: "Financial Independence",
+  solitude: "Solitude",
+  mobility: "Mobility",
+  purpose: "Purpose",
+};
+
+const OutcomeScreen = ({ handle, why, pillar, filters, stack }: Props) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-lg space-y-16 animate-fade-up text-center">
@@ -56,6 +77,34 @@ const OutcomeScreen = ({ handle, why, pillar }: Props) => {
               <span className="gallery-label">Pillar</span>
               <span className="font-body text-sm text-foreground">{pillarLabels[pillar] || pillar}</span>
             </div>
+
+            <div className="h-px bg-border" />
+
+            <div>
+              <span className="gallery-label">The Filter</span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {filters.map((f) => (
+                  <span key={f} className="border border-border px-3 py-1 font-body text-xs text-muted-foreground">
+                    {filterLabels[f] || f}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="gallery-label">The Stack</span>
+              <div className="mt-2 space-y-1">
+                {stack.map((s, i) => (
+                  <div key={s} className="flex items-center gap-3">
+                    <span className="flex h-6 w-6 items-center justify-center border border-primary text-xs font-semibold text-primary">{i + 1}</span>
+                    <span className="font-body text-sm text-foreground">{stackLabels[s] || s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-px bg-border" />
+
             <div className="flex justify-between items-baseline">
               <span className="gallery-label">Table</span>
               <span className="font-body text-sm text-foreground">Berlin — Alpha</span>
