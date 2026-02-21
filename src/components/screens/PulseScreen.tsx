@@ -15,9 +15,9 @@ const PulseScreen = ({ onNext }: Props) => {
   }, [onNext]);
 
   const messages = [
-    "Filtering for ambiguity...",
-    "Verifying certainty index...",
-    "Securing your table.",
+    "Checking your profile...",
+    "Matching you with verified childfree singles...",
+    "Reserving your seat at the table.",
   ];
 
   return (
@@ -48,7 +48,7 @@ const PulseScreen = ({ onNext }: Props) => {
         <p className="gallery-body text-foreground transition-opacity duration-500">
           {messages[phase]}
         </p>
-        <p className="gallery-label">Integrity Pulse Active</p>
+        <p className="gallery-label">Verification in progress</p>
       </div>
     </div>
   );

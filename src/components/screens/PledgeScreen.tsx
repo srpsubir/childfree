@@ -40,7 +40,7 @@ const PledgeScreen = ({ onNext }: Props) => {
             I Am Certain.
           </h2>
           <p className="gallery-body text-muted-foreground max-w-sm mx-auto">
-            I confirm a child-free life is my final decision. This is not a phase. This is architecture.
+            I confirm: I am childfree by choice. This is not a phase.
           </p>
         </div>
 

@@ -6,19 +6,19 @@ interface Props {
 
 const pillars = [
   {
-    id: "truth",
-    title: "Truth",
-    desc: "I reject the performance of parenthood. My honesty is my currency.",
+    id: "freedom",
+    title: "Freedom",
+    desc: "I want a partner who values spontaneity, travel, and living on our own terms.",
   },
   {
-    id: "autonomy",
-    title: "Autonomy",
-    desc: "My time, body, and future belong to me. Non-negotiable.",
+    id: "ambition",
+    title: "Ambition",
+    desc: "I want a partner who's building something — career, craft, or purpose — without compromise.",
   },
   {
-    id: "legacy",
-    title: "Legacy",
-    desc: "I define what I leave behind. My impact transcends biology.",
+    id: "connection",
+    title: "Connection",
+    desc: "I want deep partnership. All the intimacy, none of the parenthood.",
   },
 ];
 
@@ -31,10 +31,10 @@ const PillarScreen = ({ onNext }: Props) => {
         <div className="space-y-4 text-center">
           <p className="gallery-label">Step II</p>
           <h2 className="gallery-heading text-4xl font-semibold text-foreground">
-            Select Your Pillar
+            What do you value most in a partner?
           </h2>
           <p className="gallery-body text-muted-foreground">
-            What grounds your certainty?
+            This helps us seat you with the right people.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ const PillarScreen = ({ onNext }: Props) => {
           disabled={!selected}
           className="w-full border border-primary bg-transparent px-5 py-4 font-body text-xs uppercase tracking-[0.3em] text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed animate-fade-up-delay-2"
         >
-          Confirm Pillar
+          Confirm
         </button>
       </div>
     </div>

@@ -4,9 +4,9 @@ interface Props {
 }
 
 const pillarLabels: Record<string, string> = {
-  truth: "Truth",
-  autonomy: "Autonomy",
-  legacy: "Legacy",
+  freedom: "Freedom",
+  ambition: "Ambition",
+  connection: "Connection",
 };
 
 const LedgerScreen = ({ handle, pillar }: Props) => {
@@ -34,9 +34,9 @@ const LedgerScreen = ({ handle, pillar }: Props) => {
               Vetted
             </span>
           </div>
-          {/* Pillar */}
+          {/* Value */}
           <div className="flex items-center justify-between p-5">
-            <span className="gallery-label">Pillar</span>
+            <span className="gallery-label">Value</span>
             <span className="font-body text-sm text-foreground">
               {pillarLabels[pillar] || pillar}
             </span>
@@ -48,19 +48,14 @@ const LedgerScreen = ({ handle, pillar }: Props) => {
               The Mitte Table
             </span>
           </div>
-          {/* Track */}
-          <div className="flex items-center justify-between p-5">
-            <span className="gallery-label">Track</span>
-            <span className="font-body text-sm text-muted-foreground">Architects</span>
-          </div>
         </div>
 
         <div className="text-center space-y-4 animate-fade-up-delay-2">
           <div className="mx-auto h-px w-16 bg-primary" />
           <p className="gallery-body text-xs text-muted-foreground">
-            Your certainty has been archived.
+            Your seat is reserved.
             <br />
-            The table is set. The conversation begins.
+            We'll notify you when your table date is confirmed.
           </p>
         </div>
       </div>
