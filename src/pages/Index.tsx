@@ -11,6 +11,15 @@ import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
 type Screen = "audit" | "otp" | "why" | "pillar" | "filter" | "stack" | "pledge" | "pulse" | "outcome";
 
+const BackButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="fixed top-6 left-6 z-50 gallery-label flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+  >
+    <span className="text-base leading-none">←</span> Back
+  </button>
+);
+
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("audit");
   const [handle, setHandle] = useState("");
@@ -32,22 +41,28 @@ const Index = () => {
           <AuditScreen onNext={(h) => { setHandle(h); goTo("otp"); }} />
         )}
         {screen === "otp" && (
-          <OTPScreen onNext={() => goTo("why")} />
+          <><BackButton onClick={() => goTo("audit")} />
+          <OTPScreen onNext={() => goTo("why")} /></>
         )}
         {screen === "why" && (
-          <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} />
+          <><BackButton onClick={() => goTo("otp")} />
+          <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} /></>
         )}
         {screen === "pillar" && (
-          <PillarScreen onNext={(p) => { setPillar(p); goTo("filter"); }} />
+          <><BackButton onClick={() => goTo("why")} />
+          <PillarScreen onNext={(p) => { setPillar(p); goTo("filter"); }} /></>
         )}
         {screen === "filter" && (
-          <FilterScreen onNext={(f) => { setFilters(f); goTo("stack"); }} />
+          <><BackButton onClick={() => goTo("pillar")} />
+          <FilterScreen onNext={(f) => { setFilters(f); goTo("stack"); }} /></>
         )}
         {screen === "stack" && (
-          <StackScreen onNext={(s) => { setStack(s); goTo("pledge"); }} />
+          <><BackButton onClick={() => goTo("filter")} />
+          <StackScreen onNext={(s) => { setStack(s); goTo("pledge"); }} /></>
         )}
         {screen === "pledge" && (
-          <PledgeScreen onNext={() => goTo("pulse")} />
+          <><BackButton onClick={() => goTo("stack")} />
+          <PledgeScreen onNext={() => goTo("pulse")} /></>
         )}
         {screen === "pulse" && (
           <PulseScreen onNext={() => goTo("outcome")} />
