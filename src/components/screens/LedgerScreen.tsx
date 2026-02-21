@@ -1,5 +1,6 @@
 interface Props {
   handle: string;
+  why: string;
   pillar: string;
 }
 
@@ -9,7 +10,13 @@ const pillarLabels: Record<string, string> = {
   connection: "Connection",
 };
 
-const LedgerScreen = ({ handle, pillar }: Props) => {
+const whyLabels: Record<string, string> = {
+  design: "By Design",
+  realisation: "By Realisation",
+  priority: "By Priority",
+};
+
+const LedgerScreen = ({ handle, why, pillar }: Props) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-md space-y-10 animate-fade-up">
@@ -25,6 +32,13 @@ const LedgerScreen = ({ handle, pillar }: Props) => {
           <div className="flex items-center justify-between p-5">
             <span className="gallery-label">Handle</span>
             <span className="font-body text-sm text-foreground">@{handle}</span>
+          </div>
+          {/* Why */}
+          <div className="flex items-center justify-between p-5">
+            <span className="gallery-label">Why</span>
+            <span className="font-body text-sm text-foreground">
+              {whyLabels[why] || why}
+            </span>
           </div>
           {/* Status */}
           <div className="flex items-center justify-between p-5">
