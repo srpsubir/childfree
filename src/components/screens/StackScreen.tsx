@@ -38,10 +38,10 @@ const StackScreen = ({ onNext }: Props) => {
         <div className="space-y-4 text-center">
           <p className="gallery-label">Step VI — The Stack</p>
           <h2 className="gallery-heading text-4xl font-semibold text-foreground">
-            Rank what matters most.
+            Rank what matters most for your childfree life.
           </h2>
           <p className="gallery-body text-muted-foreground">
-            Tap to select your top 3, in order.
+            What drives your decision? Tap your top 3, in order.
           </p>
         </div>
 
