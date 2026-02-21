@@ -8,22 +8,21 @@ const PulseScreen = ({ onNext }: Props) => {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 2000);
-    const t2 = setTimeout(() => setPhase(2), 4500);
+    const t1 = setTimeout(() => setPhase(1), 2500);
+    const t2 = setTimeout(() => setPhase(2), 5000);
     const t3 = setTimeout(onNext, 7500);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [onNext]);
 
   const messages = [
-    "Checking your profile...",
-    "Matching you with verified childfree singles...",
-    "Reserving your seat at the table.",
+    "Authenticating intent...",
+    "Filtering for ambiguity...",
+    "Finalizing table placement...",
   ];
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="relative flex items-center justify-center">
-        {/* Pulse rings */}
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -35,12 +34,10 @@ const PulseScreen = ({ onNext }: Props) => {
             }}
           />
         ))}
-        {/* Expanding ring */}
         <div
           className="absolute w-16 h-16 rounded-full border border-primary/60"
           style={{ animation: "integrity-ring 2s ease-out infinite" }}
         />
-        {/* Center dot */}
         <div className="w-3 h-3 rounded-full bg-primary" />
       </div>
 

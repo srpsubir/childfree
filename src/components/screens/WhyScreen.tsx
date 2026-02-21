@@ -29,7 +29,7 @@ const WhyScreen = ({ onNext }: Props) => {
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-4 text-center">
-          <p className="gallery-label">Step II</p>
+          <p className="gallery-label">Step III</p>
           <h2 className="gallery-heading text-4xl font-semibold text-foreground">
             Why are you childfree?
           </h2>

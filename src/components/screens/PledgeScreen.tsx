@@ -40,7 +40,7 @@ const PledgeScreen = ({ onNext }: Props) => {
             I Am Certain.
           </h2>
           <p className="gallery-body text-muted-foreground max-w-sm mx-auto">
-            I confirm: I am childfree by choice. This is not a phase.
+            I confirm a child-free life is my final decision. Ambiguity ends here.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ const PledgeScreen = ({ onNext }: Props) => {
                 complete ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              {complete ? "Sealed" : "Hold"}
+              {complete ? "Sealed" : "Hold to Confirm"}
             </button>
           </div>
           <p className="gallery-label">
