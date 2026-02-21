@@ -48,7 +48,7 @@ const PulseScreen = ({ onNext }: Props) => {
         <p className="gallery-body text-foreground transition-opacity duration-500">
           {messages[phase]}
         </p>
-        <p className="gallery-label">Verification in progress</p>
+        <p className="gallery-label">Kindred verification in progress</p>
       </div>
     </div>
   );

@@ -21,9 +21,9 @@ const LedgerScreen = ({ handle, why, pillar }: Props) => {
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-md space-y-10 animate-fade-up">
         <div className="text-center space-y-2">
-          <p className="gallery-label">Membership Ledger</p>
+          <p className="gallery-label">Kindred Ledger</p>
           <h2 className="gallery-heading text-4xl font-semibold text-foreground">
-            Welcome, Architect.
+            Welcome to Kindred.
           </h2>
         </div>
 
@@ -59,7 +59,7 @@ const LedgerScreen = ({ handle, why, pillar }: Props) => {
           <div className="flex items-center justify-between p-5">
             <span className="gallery-label">Table</span>
             <span className="font-display text-sm italic text-foreground">
-              The Mitte Table
+              The Kindred Table — Berlin
             </span>
           </div>
         </div>
