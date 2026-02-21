@@ -1,124 +1,74 @@
 
 
-## Matching Brain: 5 Layers, 2 New Screens
+## Three UX Improvements (Revised)
 
-### The Insight
+### 1. Landing Page (new screen before Audit)
 
-All 5 matching layers get captured, but only 2 new screens are added to onboarding. The rest comes from data we already collect (Why + Pillar) and a post-onboarding feature (Friction Question).
+Create `src/components/screens/LandingScreen.tsx` -- a marketing entry point for cold traffic (ads, referrals, shares). Tone: relief, finality, "the search is over."
 
----
+**Content:**
+- "Kindred" wordmark (large, Playfair Display)
+- Tagline: "Done explaining. Done compromising. Done searching."
+- 3 short value props (stacked vertically, text only):
+  - "Find childfree partners who mean it."
+  - "Matched by conviction, not luck."
+  - "No ambiguity. No bait-and-switch."
+- Single CTA button: "Enter Kindred"
+- Footer micro-text: "For the certain. By audit only."
 
-### Layer Mapping
+**Style:** Same Gallery aesthetic -- charcoal background, champagne accents, Playfair headings, Inter body, sharp 0px corners. Full-viewport centered layout.
 
-| Layer | Where it lives | User effort |
-|-------|---------------|-------------|
-| Conviction Spectrum (Why-to-Why) | Already collected (Why + Pillar screens) | Zero -- free signal |
-| Anti-List + Dealbreaker Mesh | New screen: "The Filter" | One multi-select tap |
-| Non-Negotiables | New screen: "The Stack" | Rank top 3 from 5 |
-| Friction Question | Post-onboarding (monthly prompt in-app) | Outside onboarding |
-
----
-
-### New Screen 1: "The Filter" (Screen 5, after Pillar)
-
-A combined Anti-List and Dealbreaker screen. One gesture, two layers of signal.
-
-- Header: "What you refuse to tolerate."
-- Subtext: "Select all that apply. Honesty sharpens your match."
-- Display ~8 stark statement chips/cards, multi-select:
-  1. "Timeline pressure from family"
-  2. "Partners who say 'maybe someday'"
-  3. "Friends who disappeared after kids"
-  4. "Being told you'll change your mind"
-  5. "Dates who treat childfree as a phase"
-  6. "Workplaces that penalize the childless"
-  7. "Social events built around children"
-  8. "The assumption that purpose requires parenthood"
-- Minimum 2 selections required to continue
-- Continue button at the bottom
-- Data stored as an array of selected IDs
-
-**Matching logic (backend):** Users who share 4+ of the same aversions get a strong affinity boost. Users who share fewer than 2 get deprioritized. This is the highest-signal bonding layer -- shared rejection creates instant rapport.
+**Flow change in `Index.tsx`:**
+- Add `"landing"` to the `Screen` type
+- Set initial state to `"landing"`
+- Landing `onNext` navigates to `"audit"`
+- No back button on Landing (root screen)
+- Audit gets a back button pointing to Landing
 
 ---
 
-### New Screen 2: "The Stack" (Screen 6, after Filter)
+### 2. Stack Screen -- Add Childfree Context
 
-The Non-Negotiables ranking screen. Order reveals priority.
+Update `src/components/screens/StackScreen.tsx`:
 
-- Header: "Rank what matters most."
-- Subtext: "Tap to select your top 3, in order."
-- 5 lifestyle value cards displayed vertically:
-  1. **Freedom** -- "No permission needed. Ever."
-  2. **Financial Independence** -- "Your money. Your legacy."
-  3. **Solitude** -- "Alone is not lonely."
-  4. **Mobility** -- "Anywhere. Anytime."
-  5. **Purpose** -- "Built for meaning, not obligation."
-- Tap to select: first tap = rank 1, second tap on another = rank 2, third = rank 3
-- Selected cards show their rank number (1, 2, 3) with champagne highlight
-- Tap a selected card again to deselect
-- Auto-advances after 3rd selection (no button needed)
-- Data stored as ordered array of 3 IDs
+- Heading: "Rank what matters most." becomes **"Rank what matters most for your childfree life."**
+- Subtext: "Tap to select your top 3, in order." becomes **"What drives your decision? Tap your top 3, in order."**
 
-**Matching logic (backend):** Weighted comparison. Sharing the same #1 is worth 3x. Same top 3 in any order is strong. Completely different stacks = low compatibility on this axis.
+Two string changes only.
 
 ---
 
-### Updated 9-Screen Flow
+### 3. Pulse Screen -- Table Teaser
+
+Update `src/components/screens/PulseScreen.tsx`:
+
+- During the final phase (phase 2, when message reads "Finalizing table placement..."), show an additional line below the "Kindred verification in progress" label:
+- **"Preparing your Table -- a private circle of people matched to your conviction and values."**
+- This fades in with the phase 2 transition so users understand what "table placement" means before the Outcome screen reveals it.
+
+---
+
+### Updated Flow (10 screens)
 
 ```text
+0. Landing (marketing entry -- "the search is over")
 1. Audit (handle)
 2. OTP (verification)
-3. Why (conviction origin)           -- Layer: Conviction Spectrum
-4. Pillar (identity axis)            -- Layer: Conviction Spectrum
-5. Filter (aversions + dealbreakers) -- Layers: Anti-List + Dealbreaker Mesh
-6. Stack (ranked values)             -- Layer: Non-Negotiables
+3. Why (conviction origin)
+4. Pillar (identity axis)
+5. Filter (aversions)
+6. Stack (ranked values -- now with childfree context)
 7. Pledge (3s hold)
-8. Pulse (7.5s ritual)
-9. Outcome (table assignment)
+8. Pulse (integrity check + table teaser)
+9. Outcome (table assignment + ledger)
 ```
 
----
-
-### Friction Question (Post-Onboarding, NOT part of this build)
-
-This is a future in-app feature, not an onboarding screen. Documented here for completeness:
-
-- One polarizing question rotates monthly (e.g., "Is it selfish to be childfree?", "Should childfree people date parents?")
-- Binary answer (Yes / No) or short free-text
-- Users who answer the same way on recent questions get a match boost
-- Lives in a future dashboard/feed, not the onboarding flow
-
----
-
-### Data Model (for your Claude Code backend)
-
-Each completed onboarding produces a user profile with:
-
-```text
-{
-  handle: string,
-  why: "design" | "realisation" | "priority",
-  pillar: "truth" | "autonomy" | "legacy",
-  filters: string[],        // array of selected aversion IDs (2-8 items)
-  stack: [string, string, string],  // ordered top-3 value IDs
-}
-```
-
-The matching algorithm weights these layers:
-- **Filter overlap** (highest weight) -- shared aversions bond hardest
-- **Stack alignment** (high weight) -- same #1 = strong signal
-- **Why-to-Why match** (medium weight) -- same conviction origin
-- **Pillar match** (lower weight) -- complementary pillars can also work
-
----
-
-### Files to Create/Modify
+### Files Changed
 
 | Action | File |
 |--------|------|
-| Create | `src/components/screens/FilterScreen.tsx` |
-| Create | `src/components/screens/StackScreen.tsx` |
-| Modify | `src/pages/Index.tsx` (add screens 5+6, pass data, update flow) |
+| Create | `src/components/screens/LandingScreen.tsx` |
+| Modify | `src/components/screens/StackScreen.tsx` (2 string changes) |
+| Modify | `src/components/screens/PulseScreen.tsx` (add teaser line at phase 2) |
+| Modify | `src/pages/Index.tsx` (add landing screen to flow, wire navigation) |
 
-No new dependencies needed. Total new user input: ~10 seconds across both screens.
