@@ -21,13 +21,13 @@ const AuditScreen = ({ onNext }: Props) => {
           </h1>
           <div className="mx-auto h-px w-16 bg-primary" />
           <p className="gallery-body text-lg text-muted-foreground">
-            The Certainty Archive
+            Childfree Dating. Verified.
           </p>
         </div>
 
         <div className="space-y-4 animate-fade-up-delay">
           <label className="gallery-label block text-center">
-            Lifestyle Verification
+            We verify you're childfree. Then we seat you at a table.
           </label>
           <div className="border border-border bg-card">
             <input
@@ -49,9 +49,9 @@ const AuditScreen = ({ onNext }: Props) => {
         </div>
 
         <p className="gallery-body text-center text-xs text-muted-foreground animate-fade-up-delay-2">
-          Your handle serves as a lifestyle resume.
+          Your handle is your proof of lifestyle.
           <br />
-          No login. No passwords. Just proof.
+          We check it so your dates don't have to.
         </p>
       </div>
     </div>
