@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import CityNodeScreen from "@/components/screens/CityNodeScreen";
 import AuditScreen from "@/components/screens/AuditScreen";
 import OTPScreen from "@/components/screens/OTPScreen";
 import WhyScreen from "@/components/screens/WhyScreen";
@@ -8,10 +7,10 @@ import PledgeScreen from "@/components/screens/PledgeScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
-type Screen = "node" | "audit" | "otp" | "why" | "pillar" | "pledge" | "pulse" | "outcome";
+type Screen = "audit" | "otp" | "why" | "pillar" | "pledge" | "pulse" | "outcome";
 
 const Index = () => {
-  const [screen, setScreen] = useState<Screen>("node");
+  const [screen, setScreen] = useState<Screen>("audit");
   const [handle, setHandle] = useState("");
   const [why, setWhy] = useState("");
   const [pillar, setPillar] = useState("");
@@ -25,9 +24,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div key={fadeKey} className="screen-fade">
-        {screen === "node" && (
-          <CityNodeScreen onNext={() => goTo("audit")} />
-        )}
         {screen === "audit" && (
           <AuditScreen onNext={(h) => { setHandle(h); goTo("otp"); }} />
         )}
