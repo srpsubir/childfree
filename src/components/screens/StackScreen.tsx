@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface Props {
   onNext: (stack: [string, string, string]) => void;
@@ -23,20 +23,11 @@ const StackScreen = ({ onNext }: Props) => {
     });
   };
 
-  useEffect(() => {
-    if (ranked.length === 3) {
-      const timer = setTimeout(() => {
-        onNext(ranked as [string, string, string]);
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [ranked, onNext]);
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-lg space-y-10 animate-fade-up">
         <div className="space-y-4 text-center">
-          <p className="gallery-label">Step VI — The Stack</p>
+          <p className="gallery-label">Step 4</p>
           <h2 className="gallery-heading text-3xl sm:text-4xl font-semibold text-foreground">
             Rank what matters most for your childfree life.
           </h2>
@@ -74,6 +65,14 @@ const StackScreen = ({ onNext }: Props) => {
             );
           })}
         </div>
+
+        <button
+          onClick={() => ranked.length === 3 && onNext(ranked as [string, string, string])}
+          disabled={ranked.length !== 3}
+          className="w-full border border-primary bg-transparent px-5 py-4 font-body text-xs uppercase tracking-[0.3em] text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed animate-fade-up-delay-2"
+        >
+          Continue
+        </button>
       </div>
     </div>
   );

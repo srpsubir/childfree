@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import LandingScreen from "@/components/screens/LandingScreen";
@@ -31,25 +31,14 @@ const Index = () => {
   const [fadeKey, setFadeKey] = useState(0);
   const [matchCount, setMatchCount] = useState<number | null>(null);
 
-  // If user is already signed in and still on auth screen, advance
-  useEffect(() => {
-    if (user && screen === "auth") {
-      goTo("why");
-    }
-  }, [user, screen]);
-
   const goTo = useCallback((s: Screen) => {
     setFadeKey((k) => k + 1);
     setScreen(s);
   }, []);
 
   const handleLandingNext = useCallback(() => {
-    if (user) {
-      goTo("why");
-    } else {
-      goTo("auth");
-    }
-  }, [user, goTo]);
+    goTo("why");
+  }, [goTo]);
 
   const saveProfileAndMatch = useCallback(async () => {
     if (!user) {
@@ -103,9 +92,6 @@ const Index = () => {
         {screen === "landing" && (
           <LandingScreen onNext={handleLandingNext} />
         )}
-        {screen === "auth" && (
-          <AuthGate onAuthenticated={() => goTo("why")} />
-        )}
         {screen === "why" && (
           <><BackButton onClick={() => goTo("landing")} />
           <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} /></>
@@ -120,7 +106,11 @@ const Index = () => {
         )}
         {screen === "stack" && (
           <><BackButton onClick={() => goTo("filter")} />
-          <StackScreen onNext={(s) => { setStack(s); goTo("pulse"); }} /></>
+          <StackScreen onNext={(s) => { setStack(s); user ? goTo("pulse") : goTo("auth"); }} /></>
+        )}
+        {screen === "auth" && (
+          <><BackButton onClick={() => goTo("stack")} />
+          <AuthGate onAuthenticated={() => goTo("pulse")} /></>
         )}
         {screen === "pulse" && (
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />

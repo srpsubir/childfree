@@ -23,7 +23,7 @@ const AuthGate = ({ onAuthenticated }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm space-y-10 text-center animate-fade-up">
         <div className="space-y-4">
           <h2 className="gallery-heading text-3xl md:text-4xl font-semibold text-foreground">
@@ -37,7 +37,7 @@ const AuthGate = ({ onAuthenticated }: Props) => {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-foreground text-background px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-3"
+          className="w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-3"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
