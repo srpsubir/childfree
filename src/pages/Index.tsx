@@ -36,6 +36,10 @@ const Index = () => {
   }, []);
 
   const saveProfileAndMatch = useCallback(async () => {
+    if (!handle) {
+      console.log("Skipping save — no handle yet");
+      return;
+    }
     try {
       await supabase.from("profiles").upsert(
         {
