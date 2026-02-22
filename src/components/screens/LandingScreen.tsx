@@ -32,8 +32,8 @@ const LandingScreen = ({ onNext }: Props) => {
   }, [complete]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="w-full max-w-md space-y-16 text-center animate-fade-up">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md space-y-10 text-center animate-fade-up">
         <h1 className="gallery-heading text-5xl sm:text-6xl font-semibold text-foreground tracking-tight">
           Kindred
         </h1>
@@ -52,11 +52,7 @@ const LandingScreen = ({ onNext }: Props) => {
           No ambiguity. No bait-and-switch.
         </p>
 
-        <p className="gallery-heading text-lg text-foreground/60 animate-fade-up-delay">
-          One table. Six seats. No screens.
-        </p>
-
-        <div className="flex flex-col items-center space-y-6 py-4 animate-fade-up-delay-2">
+        <div className="flex flex-col items-center space-y-6 animate-fade-up-delay-2">
           <div className="relative">
             <svg className="w-32 h-32" viewBox="0 0 128 128">
               <circle
@@ -81,7 +77,7 @@ const LandingScreen = ({ onNext }: Props) => {
               onMouseLeave={endHold}
               onTouchStart={startHold}
               onTouchEnd={endHold}
-              className={`absolute inset-0 flex items-center justify-center font-body text-xs uppercase tracking-[0.2em] transition-colors ${
+              className={`absolute inset-0 flex items-center justify-center font-body text-[10px] uppercase tracking-[0.15em] whitespace-nowrap transition-colors ${
                 complete ? "text-primary" : "text-muted-foreground"
               }`}
             >

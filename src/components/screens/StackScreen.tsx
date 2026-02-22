@@ -33,11 +33,11 @@ const StackScreen = ({ onNext }: Props) => {
   }, [ranked, onNext]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-lg space-y-10 animate-fade-up">
         <div className="space-y-4 text-center">
           <p className="gallery-label">Step VI — The Stack</p>
-          <h2 className="gallery-heading text-4xl font-semibold text-foreground">
+          <h2 className="gallery-heading text-3xl sm:text-4xl font-semibold text-foreground">
             Rank what matters most for your childfree life.
           </h2>
           <p className="gallery-body text-muted-foreground">
