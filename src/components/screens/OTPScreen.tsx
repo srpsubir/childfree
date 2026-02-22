@@ -29,7 +29,12 @@ const OTPScreen = ({ onNext }: Props) => {
       if (data?.error) throw new Error(data.error);
       setSent(true);
     } catch (e: any) {
-      setError(e.message || "Failed to send code.");
+      const msg = e.message || "";
+      if (msg.includes("non-2xx") || msg.includes("Failed to send")) {
+        setError("Could not send SMS. Check your number and try again.");
+      } else {
+        setError(msg || "Failed to send code.");
+      }
     } finally {
       setSending(false);
     }
