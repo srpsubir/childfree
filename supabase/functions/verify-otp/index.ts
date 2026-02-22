@@ -1,5 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -22,50 +20,39 @@ Deno.serve(async (req) => {
 
     const cleanPhone = phone.replace(/[^\d+]/g, "");
 
-    // Hash the submitted code
-    const encoder = new TextEncoder();
-    const data = encoder.encode(code);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const codeHash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
+    if (!TWILIO_ACCOUNT_SID) throw new Error("TWILIO_ACCOUNT_SID not configured");
 
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
+    if (!TWILIO_AUTH_TOKEN) throw new Error("TWILIO_AUTH_TOKEN not configured");
 
-    // Find matching unexpired, unverified OTP
-    const { data: otpRows, error: fetchError } = await supabase
-      .from("otp_codes")
-      .select("id, expires_at")
-      .eq("phone", cleanPhone)
-      .eq("code_hash", codeHash)
-      .eq("verified", false)
-      .gte("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(1);
+    const TWILIO_VERIFY_SERVICE_SID = Deno.env.get("TWILIO_VERIFY_SERVICE_SID")?.trim();
+    if (!TWILIO_VERIFY_SERVICE_SID) throw new Error("TWILIO_VERIFY_SERVICE_SID not configured");
 
-    if (fetchError) {
-      console.error("OTP fetch error:", fetchError);
-      return new Response(JSON.stringify({ error: "Verification failed" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const checkUrl = `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/VerificationCheck`;
 
-    if (!otpRows || otpRows.length === 0) {
-      return new Response(JSON.stringify({ verified: false, error: "Invalid or expired code" }), {
+    const res = await fetch(checkUrl, {
+      method: "POST",
+      headers: {
+        Authorization: "Basic " + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ To: cleanPhone, Code: code }).toString(),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(`Twilio Verify check error [${res.status}]:`, JSON.stringify(data));
+      return new Response(JSON.stringify({ verified: false, error: "Verification failed" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Mark as verified
-    await supabase
-      .from("otp_codes")
-      .update({ verified: true })
-      .eq("id", otpRows[0].id);
+    const verified = data.status === "approved";
 
-    return new Response(JSON.stringify({ verified: true }), {
+    return new Response(JSON.stringify({ verified }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
