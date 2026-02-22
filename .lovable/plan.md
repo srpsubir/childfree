@@ -1,78 +1,123 @@
 
+# Beta Launch: Google Auth, Calendar Invite, Admin, Email
 
-# Redesign Outcome Screen as a Table Invitation Card
+## Overview
 
-## The Problem
+Five changes to make this launchable for 50 users by Saturday 1 March, 7 PM at QBA (Oranienburger Str. 45, 10117 Berlin).
 
-The current Outcome screen is a database dump disguised as UX. It shows users their own answers (Why, Pillar, Filters, Stack) back to them in a "Kindred Ledger" -- information they already know because they just entered it. This adds no value and feels clinical.
+---
 
-## The TimeLeft Insight
+## 1. Google Sign-In (replace handle/phone)
 
-TimeLeft's post-booking screen works because it answers the only questions users actually have after signing up:
+Add Google Auth via Lovable Cloud's managed OAuth. Users sign in with Google on the Landing screen before starting the onboarding flow.
 
-- **When** is this happening?
-- **Where** will it be?
-- **Who** will be there?
-
-They reveal these details progressively (date first, venue on the day), creating anticipation. The screen feels like an **invitation**, not a confirmation receipt.
-
-## The New Outcome Screen
-
-Replace the Ledger with a minimal, elegant **Table Invitation Card**. Since Kindred doesn't yet have real scheduling, the card uses a "pending" state that builds mystery and anticipation.
-
-### Layout (top to bottom)
-
-1. **Status badge** -- small label at top: "Seat Confirmed"
-2. **Headline** -- "The Berlin Table" (keep this, it's strong)
-3. **Tagline** -- "One table. Six strangers. No small talk."
-4. **Invitation card** -- a bordered card with three rows:
-   - **Date** -- "TBA" with a subtle "You'll be notified" note (placeholder until real scheduling exists)
-   - **Location** -- "Berlin" with a lock icon and "Revealed 24h before"
-   - **Seats** -- "6" with "Matched by conviction"
-5. **Countdown/status line** -- "Your table is being assembled" or match count if available
-6. **CTA button** -- "Claim Your Seat" (keep)
-
-### What Gets Removed
-
-- The entire "Kindred Ledger" section (handle, why, pillar, filters, stack display)
-- All label maps (`pillarLabels`, `whyLabels`, `filterLabels`, `stackLabels`)
-- The `handle`, `why`, `pillar`, `filters`, `stack` props -- the component no longer needs them
-
-### What Gets Simplified
-
-**Props** shrink from 6 fields to just `matchCount`:
-```
-interface Props {
-  matchCount?: number | null;
-}
+**Flow change:**
+```text
+Landing (hold to enter)
+  --> Google Sign-In prompt
+    --> Why --> Pillar --> Filter --> Stack --> Pulse --> Outcome
 ```
 
-**Index.tsx** stops passing handle/why/pillar/filters/stack to OutcomeScreen.
+- After "hold to enter" completes, user is prompted to sign in with Google (if not already signed in)
+- Their Google email becomes the profile identifier (replaces `handle`)
+- `phone` field is no longer collected
 
-### The Invitation Card Design
+**Database migration:**
+- Add `user_id UUID` column to `profiles` (references auth.users, nullable for now)
+- Add `email TEXT` column to `profiles`
+- Make `handle` nullable (since new users won't have one)
 
-The card uses the existing design language (border, gallery-label, font-body) but feels like an event ticket rather than a form summary:
+**Files changed:**
+- `Index.tsx` -- add auth state listener, redirect to Google sign-in after landing, use email/user_id instead of handle
+- `LandingScreen.tsx` -- no change (hold-to-enter stays)
+- New: `src/hooks/useAuth.ts` -- auth state hook
+- New: `src/components/AuthGate.tsx` -- Google sign-in prompt component
 
-- Three horizontal rows with an icon/label on the left and value on the right
-- Divider lines between rows
-- Locked items show a subtle lock indicator and "revealed soon" text
-- Clean, centered, aspirational
+**Removed from flow:** `AuditScreen.tsx` and `OTPScreen.tsx` stay in codebase but are not used.
 
-## Technical Changes
+---
 
-| File | Change |
-|------|--------|
-| `OutcomeScreen.tsx` | Complete rewrite: remove all label maps and data props, replace Ledger with invitation card layout |
-| `Index.tsx` | Remove handle/why/pillar/filters/stack props from OutcomeScreen render, pass only matchCount |
+## 2. "Claim Your Seat" -- Google Calendar Link
 
-## Design Details
+The CTA button opens a pre-filled Google Calendar event in a new tab. No API needed -- uses Google's public calendar URL scheme.
 
-The invitation card keeps the existing aesthetic:
-- `border border-border bg-card` container
-- `gallery-label` for field labels
-- `font-body text-sm` for values
-- Subtle animations with `animate-fade-up` variants
-- A calendar icon, map-pin icon, and users icon from lucide-react for the three rows
+**Event details:**
+- Title: "Kindred -- The Berlin Table"
+- Date: Saturday 1 March 2025, 7:00 PM -- 10:00 PM CET
+- Location: QBA, Oranienburger Str. 45, 10117 Berlin
+- Description: "One table. Six strangers. No small talk. Your seat has been confirmed."
+- Link to Google Maps: https://maps.app.goo.gl/mg9rYYWWQdxF83ey8
 
-The overall feel shifts from "here's your profile data" to "here's your invitation -- stay tuned."
+**Update OutcomeScreen invitation card:**
+- Date row: "Sat, 1 March" / "7:00 PM CET"
+- Location row: "QBA, Berlin" with link to Google Maps (clickable)
+- Keep the lock icon but change text to "Oranienburger Str. 45"
 
+**Files changed:** `OutcomeScreen.tsx`
+
+---
+
+## 3. Admin Page (`/admin`)
+
+A simple protected admin page showing all signups and their onboarding data.
+
+**Features:**
+- Table view of all profiles (email, why, pillar, filters, stack, created_at, table_id)
+- Count of total signups
+- Button to manually trigger `assign-tables` edge function
+- Protected by role check (admin role in `user_roles` table)
+
+**Database setup:**
+- Create `app_role` enum and `user_roles` table (per security guidelines)
+- Create `has_role` security definer function
+- Your user ID gets an admin role inserted
+
+**Files created:**
+- `src/pages/Admin.tsx` -- admin dashboard
+- Route added in `App.tsx`
+
+---
+
+## 4. Post-Signup Welcome Email
+
+New edge function `send-welcome-email` that fires after profile save. Sends a simple welcome/confirmation email to the user's Google email address.
+
+**Challenge:** We need an email service API key (e.g., Resend). No email service is currently configured.
+
+**Approach:**
+- Create `send-welcome-email` edge function
+- Set up Resend (free tier: 100 emails/day, more than enough for 50 users)
+- I'll walk you through getting a Resend API key and adding it as a secret
+- The function sends a minimal email: event confirmation + date + venue + calendar link
+
+**Files created:** `supabase/functions/send-welcome-email/index.ts`
+
+---
+
+## 5. Clean Up SMS/OTP
+
+- Remove OTP-related edge function invocations from the flow
+- `send-otp` and `verify-otp` functions stay deployed but are no longer called
+- Remove `phone` state from `Index.tsx`
+
+---
+
+## Technical Summary
+
+| Change | Files | Type |
+|--------|-------|------|
+| Google Auth | `Index.tsx`, new `useAuth.ts`, new `AuthGate.tsx` | Frontend + Cloud config |
+| Calendar CTA | `OutcomeScreen.tsx` | Frontend |
+| Admin page | New `Admin.tsx`, `App.tsx` | Frontend + DB migration |
+| Welcome email | New `send-welcome-email/index.ts` | Edge function (needs Resend API key) |
+| DB migration | `profiles` (add user_id, email; handle nullable), `user_roles`, `app_role` enum, `has_role` function | Database |
+| Cleanup | `Index.tsx` (remove phone/handle state) | Frontend |
+
+## Sequencing
+
+1. Database migration (user_id, email, user_roles)
+2. Google Auth setup + auth hook
+3. Update Index.tsx flow (remove handle/phone, use auth)
+4. Update OutcomeScreen with real event details + calendar link
+5. Build admin page
+6. Set up Resend + welcome email function
