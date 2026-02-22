@@ -1,6 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import LandingScreen from "@/components/screens/LandingScreen";
+import AuthGate from "@/components/AuthGate";
 import WhyScreen from "@/components/screens/WhyScreen";
 import PillarScreen from "@/components/screens/PillarScreen";
 import FilterScreen from "@/components/screens/FilterScreen";
@@ -8,7 +10,7 @@ import StackScreen from "@/components/screens/StackScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
-type Screen = "landing" | "why" | "pillar" | "filter" | "stack" | "pulse" | "outcome";
+type Screen = "landing" | "auth" | "why" | "pillar" | "filter" | "stack" | "pulse" | "outcome";
 
 const BackButton = ({ onClick }: { onClick: () => void }) => (
   <button
@@ -20,9 +22,8 @@ const BackButton = ({ onClick }: { onClick: () => void }) => (
 );
 
 const Index = () => {
+  const { user, loading } = useAuth();
   const [screen, setScreen] = useState<Screen>("landing");
-  const [handle, setHandle] = useState("");
-  const [phone, setPhone] = useState("");
   const [why, setWhy] = useState("");
   const [pillar, setPillar] = useState("");
   const [filters, setFilters] = useState<string[]>([]);
@@ -30,27 +31,46 @@ const Index = () => {
   const [fadeKey, setFadeKey] = useState(0);
   const [matchCount, setMatchCount] = useState<number | null>(null);
 
+  // If user is already signed in and still on auth screen, advance
+  useEffect(() => {
+    if (user && screen === "auth") {
+      goTo("why");
+    }
+  }, [user, screen]);
+
   const goTo = useCallback((s: Screen) => {
     setFadeKey((k) => k + 1);
     setScreen(s);
   }, []);
 
+  const handleLandingNext = useCallback(() => {
+    if (user) {
+      goTo("why");
+    } else {
+      goTo("auth");
+    }
+  }, [user, goTo]);
+
   const saveProfileAndMatch = useCallback(async () => {
-    if (!handle) {
-      console.log("Skipping save — no handle yet");
+    if (!user) {
+      console.log("Skipping save — no user");
       return;
     }
     try {
+      const email = user.email ?? "";
+      const handle = email.split("@")[0]; // derive handle from email
+
       await supabase.from("profiles").upsert(
         {
+          user_id: user.id,
+          email,
           handle,
-          phone,
           why,
           pillar,
           filters,
           stack: stack as string[],
         },
-        { onConflict: "handle" }
+        { onConflict: "user_id" }
       );
 
       const { data } = await supabase.functions.invoke("compute-matches", {
@@ -59,16 +79,32 @@ const Index = () => {
       if (data?.total !== undefined) {
         setMatchCount(data.total);
       }
+
+      // Fire-and-forget welcome email
+      supabase.functions.invoke("send-welcome-email", {
+        body: { email, name: user.user_metadata?.full_name || handle },
+      }).catch(console.error);
     } catch (e) {
       console.error("Profile save/match error:", e);
     }
-  }, [handle, phone, why, pillar, filters, stack]);
+  }, [user, why, pillar, filters, stack]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="gallery-label animate-pulse">Loading…</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div key={fadeKey} className="screen-fade">
         {screen === "landing" && (
-          <LandingScreen onNext={() => goTo("why")} />
+          <LandingScreen onNext={handleLandingNext} />
+        )}
+        {screen === "auth" && (
+          <AuthGate onAuthenticated={() => goTo("why")} />
         )}
         {screen === "why" && (
           <><BackButton onClick={() => goTo("landing")} />
