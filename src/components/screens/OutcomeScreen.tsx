@@ -4,6 +4,7 @@ interface Props {
   pillar: string;
   filters: string[];
   stack: [string, string, string];
+  matchCount?: number | null;
 }
 
 const pillarLabels: Record<string, string> = {
@@ -37,7 +38,7 @@ const stackLabels: Record<string, string> = {
   purpose: "Purpose",
 };
 
-const OutcomeScreen = ({ handle, why, pillar, filters, stack }: Props) => {
+const OutcomeScreen = ({ handle, why, pillar, filters, stack, matchCount }: Props) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6">
       <div className="w-full max-w-lg space-y-16 animate-fade-up text-center">
@@ -50,6 +51,13 @@ const OutcomeScreen = ({ handle, why, pillar, filters, stack }: Props) => {
             For the architects of their own lives. You are matched with those who
             prioritize autonomy and vision over the expected path.
           </p>
+          {matchCount !== null && matchCount !== undefined && (
+            <p className="gallery-label text-primary animate-fade-up-delay">
+              {matchCount > 0
+                ? `${matchCount} potential match${matchCount === 1 ? "" : "es"} found`
+                : "Your table is being assembled"}
+            </p>
+          )}
         </div>
 
         {/* Ledger Card */}
