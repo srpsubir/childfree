@@ -1,8 +1,20 @@
-import { Calendar, MapPin, Users, Lock } from "lucide-react";
+import { Calendar, MapPin, Users, ExternalLink } from "lucide-react";
 
 interface Props {
   matchCount?: number | null;
 }
+
+const EVENT = {
+  title: "Kindred — The Berlin Table",
+  date: "Sat, 1 March",
+  time: "7:00 PM CET",
+  venue: "QBA, Berlin",
+  address: "Oranienburger Str. 45, 10117 Berlin",
+  mapsLink: "https://maps.app.goo.gl/mg9rYYWWQdxF83ey8",
+  description: "One table. Six strangers. No small talk. Your seat has been confirmed.",
+  // Google Calendar link: 1 March 2025, 19:00–22:00 CET (18:00–21:00 UTC)
+  calendarUrl: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Kindred — The Berlin Table")}&dates=20250301T180000Z/20250301T210000Z&location=${encodeURIComponent("QBA, Oranienburger Str. 45, 10117 Berlin")}&details=${encodeURIComponent("One table. Six strangers. No small talk.\n\nYour seat has been confirmed.\n\nVenue: https://maps.app.goo.gl/mg9rYYWWQdxF83ey8")}`,
+};
 
 const OutcomeScreen = ({ matchCount }: Props) => {
   return (
@@ -20,7 +32,7 @@ const OutcomeScreen = ({ matchCount }: Props) => {
           </h2>
 
           <p className="gallery-body text-muted-foreground max-w-sm mx-auto leading-relaxed">
-            One table. Six strangers. No small talk.
+            {EVENT.description}
           </p>
         </div>
 
@@ -33,8 +45,8 @@ const OutcomeScreen = ({ matchCount }: Props) => {
               <span className="gallery-label">Date</span>
             </div>
             <div className="text-right">
-              <span className="font-body text-sm text-foreground">TBA</span>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">You'll be notified</p>
+              <span className="font-body text-sm text-foreground">{EVENT.date}</span>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{EVENT.time}</p>
             </div>
           </div>
 
@@ -46,14 +58,19 @@ const OutcomeScreen = ({ matchCount }: Props) => {
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <span className="gallery-label">Location</span>
             </div>
-            <div className="flex items-center gap-2 text-right">
-              <div>
-                <span className="font-body text-sm text-foreground">Berlin</span>
-                <p className="font-body text-[11px] text-muted-foreground mt-0.5 flex items-center justify-end gap-1">
-                  <Lock className="h-3 w-3" />
-                  Revealed 24h before
-                </p>
-              </div>
+            <div className="text-right">
+              <a
+                href={EVENT.mapsLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-sm text-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+              >
+                {EVENT.venue}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">
+                {EVENT.address}
+              </p>
             </div>
           </div>
 
@@ -79,10 +96,15 @@ const OutcomeScreen = ({ matchCount }: Props) => {
             : "Your table is being assembled"}
         </p>
 
-        {/* CTA */}
-        <button className="w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 animate-fade-up-delay-2">
-          Claim Your Seat
-        </button>
+        {/* CTA — Google Calendar */}
+        <a
+          href={EVENT.calendarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 animate-fade-up-delay-2 text-center"
+        >
+          Add to Google Calendar
+        </a>
       </div>
     </div>
   );
