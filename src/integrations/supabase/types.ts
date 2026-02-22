@@ -43,6 +43,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          assigned_at: string | null
           created_at: string
           filters: string[] | null
           handle: string
@@ -50,9 +51,11 @@ export type Database = {
           phone: string | null
           pillar: string | null
           stack: string[] | null
+          table_id: string | null
           why: string | null
         }
         Insert: {
+          assigned_at?: string | null
           created_at?: string
           filters?: string[] | null
           handle: string
@@ -60,9 +63,11 @@ export type Database = {
           phone?: string | null
           pillar?: string | null
           stack?: string[] | null
+          table_id?: string | null
           why?: string | null
         }
         Update: {
+          assigned_at?: string | null
           created_at?: string
           filters?: string[] | null
           handle?: string
@@ -70,7 +75,43 @@ export type Database = {
           phone?: string | null
           pillar?: string | null
           stack?: string[] | null
+          table_id?: string | null
           why?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tables: {
+        Row: {
+          city: string
+          created_at: string
+          id: string
+          max_seats: number
+          name: string
+          status: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          id?: string
+          max_seats?: number
+          name: string
+          status?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          id?: string
+          max_seats?: number
+          name?: string
+          status?: string
         }
         Relationships: []
       }
