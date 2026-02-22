@@ -52,7 +52,11 @@ const LandingScreen = ({ onNext }: Props) => {
           No ambiguity. No bait-and-switch.
         </p>
 
-        <div className="flex flex-col items-center space-y-6 animate-fade-up-delay-2">
+        <p className="gallery-heading text-lg text-foreground/60 animate-fade-up-delay">
+          One table. Six seats. No screens.
+        </p>
+
+        <div className="flex flex-col items-center space-y-6 py-4 animate-fade-up-delay-2">
           <div className="relative">
             <svg className="w-32 h-32" viewBox="0 0 128 128">
               <circle

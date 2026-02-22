@@ -3,9 +3,9 @@ interface Props {
 }
 
 const pillars = [
-  { id: "truth", title: "Truth" },
-  { id: "autonomy", title: "Autonomy" },
-  { id: "legacy", title: "Legacy" },
+  { id: "truth", title: "Truth", desc: "You live unfiltered. No performance, no pretense — just radical honesty about who you are." },
+  { id: "autonomy", title: "Autonomy", desc: "Your life, your rules. You design every day without permission or compromise." },
+  { id: "legacy", title: "Legacy", desc: "What you leave behind is defined by impact, not bloodline." },
 ];
 
 const PillarScreen = ({ onNext }: Props) => {
@@ -27,6 +27,7 @@ const PillarScreen = ({ onNext }: Props) => {
               className="w-full border border-border bg-card p-6 text-left transition-all hover:border-primary"
             >
               <h3 className="gallery-heading text-xl text-foreground">{p.title}</h3>
+              <p className="mt-2 font-body text-sm text-muted-foreground">{p.desc}</p>
             </button>
           ))}
         </div>

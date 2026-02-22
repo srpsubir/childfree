@@ -48,8 +48,7 @@ const OutcomeScreen = ({ handle, why, pillar, filters, stack, matchCount }: Prop
             The Berlin Table.
           </h2>
           <p className="gallery-body text-muted-foreground max-w-md mx-auto leading-relaxed">
-            For the architects of their own lives. You are matched with those who
-            prioritize autonomy and vision over the expected path.
+            Your table is being set. You'll receive a date, a location, and five names.
           </p>
           {matchCount !== null && matchCount !== undefined && (
             <p className="gallery-label text-primary animate-fade-up-delay">
