@@ -86,9 +86,6 @@ const LandingScreen = ({ onNext }: Props) => {
           </div>
         </div>
 
-        <p className="gallery-label text-muted-foreground/60">
-          For the certain. By conviction only.
-        </p>
       </div>
     </div>
   );
