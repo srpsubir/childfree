@@ -90,7 +90,7 @@ const Index = () => {
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
         )}
         {screen === "outcome" && (
-          <OutcomeScreen handle={handle} why={why} pillar={pillar} filters={filters} stack={stack} matchCount={matchCount} />
+          <OutcomeScreen matchCount={matchCount} />
         )}
       </div>
     </div>
