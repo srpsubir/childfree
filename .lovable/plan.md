@@ -1,63 +1,109 @@
 
+# Three Changes: Pillar Descriptions, Landing CTA Padding, IRL Surfacing, and Matching Brain
 
-# Merge Pledge into Landing CTA
+## 1. PillarScreen -- Add Descriptions to Options
 
-## The Insight
+The three pillar options ("Truth", "Autonomy", "Legacy") currently show only titles with no context. Add a `desc` field to each, matching the pattern already used in `WhyScreen`.
 
-With Google Sign-In now serving as the "prove you're real" gate, the separate Pledge screen (hold for 3 seconds) becomes redundant -- two trust barriers back-to-back. Instead, move the hold gesture to the Landing screen's CTA. This way, the very first interaction signals commitment: you don't just *click* "Enter Kindred," you *hold* to enter.
+**Proposed descriptions:**
 
-## New Screen Flow (8 screens, down from 10)
+| Pillar | Description |
+|--------|-------------|
+| Truth | You live unfiltered. No performance, no pretense -- just radical honesty about who you are. |
+| Autonomy | Your life, your rules. You design every day without permission or compromise. |
+| Legacy | What you leave behind is defined by impact, not bloodline. |
 
-1. **Landing** -- hold CTA replaces "Enter Kindred" button
-2. Why
-3. Pillar
-4. Filter
-5. Stack
-6. **Identity** (Google Sign-In)
-7. Pulse
-8. Outcome
+Each option button will show the title and a subtitle line beneath it, identical to how `WhyScreen` renders its options.
 
-The separate `PledgeScreen` is removed entirely.
+## 2. LandingScreen -- Fix CTA Padding
 
-## Landing Screen Changes
+The hold-to-enter ring sits inside `space-y-16` with the tagline directly below. The ring area itself has no extra bottom padding, which may feel cramped. Will add vertical padding/margin around the ring container to give it breathing room (e.g., `py-4` or adjusting the parent spacing).
 
-Replace the current simple button with the hold-to-confirm ring from `PledgeScreen.tsx`. The copy adapts:
+## 3. Surface IRL Meetup Expectation
 
-- **Current button:** "Enter Kindred" (click)
-- **New interaction:** A 3-second hold ring with "Hold to Enter" label
-- On completion, text changes to "Entered" and auto-advances after 600ms
-- Subtext below: "For the certain. By conviction only." (replaces "For the certain. By audit only.")
+The user currently has no idea they're signing up for an in-person meetup until... never. This needs to be introduced gradually across three touchpoints:
 
-The progress ring SVG and hold logic from `PledgeScreen` moves into `LandingScreen`.
+**A. Landing Screen (subtle hint)**
+Add a line to the manifesto section:
+> "One table. Six seats. No screens."
 
-## What Gets Removed
+This plants the seed without explaining it.
 
-- `PledgeScreen.tsx` -- deleted
-- `pledge` removed from the screen type union and flow in `Index.tsx`
-- All pledge-related routing and back-button wiring removed
+**B. Pulse Screen (explicit reveal)**
+The Pulse screen already shows progressive messages. Update the final phase message (phase 2) to make the IRL nature clear:
+> "Preparing your Table -- a private circle of people matched to your conviction and values. You'll meet in person."
 
-## What Gets Modified
+**C. Outcome Screen (confirmation)**
+Add a line below "The Berlin Table" heading:
+> "Your table is being set. You'll receive a date, a location, and five names."
 
-### `LandingScreen.tsx`
-- Import the hold logic (interval-based progress tracking) from the current Pledge implementation
-- Replace the `<button>` CTA with the circular progress ring + hold interaction
-- Keep existing headline, manifesto copy, and fade-up animations
-- Update bottom tagline from "By audit only" to "By conviction only"
+This confirms the IRL expectation and builds anticipation.
 
-### `Index.tsx`
-- Remove `pledge` from the `Screen` type
-- Remove `PledgeScreen` import and rendering
-- Update flow: `stack` advances directly to `identity` (the new Google Sign-In screen)
-- Remove back-button wiring for the pledge step
+## 4. The Matching Brain -- Table Placement Engine
 
-## Technical Details
+The current `compute-matches` function does pairwise scoring but doesn't form groups (tables). A real table placement system needs to assemble groups of ~6 compatible people, not just rank individuals.
 
-The hold mechanic is already built in `PledgeScreen.tsx` (lines 14-30):
-- 3000ms hold duration, 30ms tick interval
-- `onMouseDown`/`onTouchStart` starts the timer
-- `onMouseUp`/`onMouseLeave`/`onTouchEnd` resets if incomplete
-- SVG circle with `strokeDashoffset` for the progress ring
-- On completion: state flips to "complete," 600ms delay, then `onNext()`
+### New Edge Function: `assign-tables`
 
-This logic transfers directly into `LandingScreen` with only copy changes.
+This function runs periodically (or is triggered after enough users onboard) and:
 
+1. **Fetches all unassigned profiles** (profiles without a `table_id`)
+2. **Scores all pairs** using the existing weighted algorithm
+3. **Forms tables of 6** using a greedy clustering approach:
+   - Pick the highest-scoring unmatched pair as seeds
+   - Iteratively add the person with the highest average compatibility to the growing group
+   - Stop at 6 members per table
+   - Repeat until no more valid tables can be formed (remaining users wait)
+4. **Writes table assignments** back to the database
+
+### Database Changes
+
+**New `tables` table:**
+- `id` UUID (primary key)
+- `name` TEXT (e.g., "Berlin -- Alpha")
+- `city` TEXT
+- `created_at` TIMESTAMP
+- `status` TEXT (forming / ready / scheduled / completed)
+- `max_seats` INTEGER (default 6)
+
+**Add to `profiles` table:**
+- `table_id` UUID (nullable, references `tables.id`)
+- `assigned_at` TIMESTAMP (nullable)
+
+### Updated `compute-matches`
+
+Keep this function for showing match counts during onboarding (real-time feedback). It stays as-is but will later query by `user_id` instead of `handle` (part of the Google Sign-In migration).
+
+### Clustering Algorithm (inside `assign-tables`)
+
+```text
+1. Load all profiles WHERE table_id IS NULL
+2. Compute NxN compatibility matrix using existing score function
+3. While unassigned pool >= 6:
+   a. Find highest-scoring pair -> seed a new table
+   b. Repeat 4 times:
+      - For each remaining candidate, compute avg score vs current table members
+      - Add the candidate with highest avg score
+   c. Create table record, assign all 6 profiles
+4. Remaining users (<6) stay in pool for next run
+```
+
+### Constraints (future iterations)
+- Geographic clustering (city field on profiles -- not yet collected)
+- Gender balance (not yet collected)
+- Scheduling preferences (not yet collected)
+
+For now, the algorithm is conviction-based only, using the four existing signals. Geography and demographics can be layered in later.
+
+## Technical Summary
+
+| Change | Files |
+|--------|-------|
+| Pillar descriptions | `PillarScreen.tsx` |
+| Landing CTA padding | `LandingScreen.tsx` |
+| IRL hint on Landing | `LandingScreen.tsx` |
+| IRL reveal on Pulse | `PulseScreen.tsx` |
+| IRL confirm on Outcome | `OutcomeScreen.tsx` |
+| New `tables` table | Database migration |
+| `table_id` on profiles | Database migration |
+| New `assign-tables` function | `supabase/functions/assign-tables/index.ts` |
