@@ -1,47 +1,63 @@
 
 
-# Switch to Twilio Verify API
+# Merge Pledge into Landing CTA
 
-## Why
+## The Insight
 
-The current implementation manually generates OTP codes, hashes them, stores them in the database, and sends them via the Twilio Messages API. Twilio Verify is a purpose-built verification service that handles all of this automatically -- code generation, delivery, expiry, rate limiting, and verification -- with a single API call each way.
+With Google Sign-In now serving as the "prove you're real" gate, the separate Pledge screen (hold for 3 seconds) becomes redundant -- two trust barriers back-to-back. Instead, move the hold gesture to the Landing screen's CTA. This way, the very first interaction signals commitment: you don't just *click* "Enter Kindred," you *hold* to enter.
 
-## What Changes
+## New Screen Flow (8 screens, down from 10)
 
-### 1. Update `send-otp` edge function
-- Replace the manual code generation, hashing, database insert, and Twilio Messages API call with a single call to the **Twilio Verify API** (`POST /v2/Services/{ServiceSID}/Verifications`)
-- This sends `{ To: phone, Channel: "sms" }` and Twilio handles everything else
+1. **Landing** -- hold CTA replaces "Enter Kindred" button
+2. Why
+3. Pillar
+4. Filter
+5. Stack
+6. **Identity** (Google Sign-In)
+7. Pulse
+8. Outcome
 
-### 2. Update `verify-otp` edge function
-- Replace the database lookup and hash comparison with a single call to **Twilio Verify Check API** (`POST /v2/Services/{ServiceSID}/VerificationCheck`)
-- This sends `{ To: phone, Code: code }` and Twilio returns a status of `approved` or `pending`
+The separate `PledgeScreen` is removed entirely.
 
-### 3. Add a new secret: `TWILIO_VERIFY_SERVICE_SID`
-- You need to create a Verify Service in your Twilio Console (Explore Products > Verify > Create a Service)
-- Copy the Service SID (starts with `VA...`) and provide it when prompted
+## Landing Screen Changes
 
-### 4. Simplify the `otp_codes` table usage
-- The `otp_codes` table is no longer needed for the core OTP flow since Twilio manages state
-- It can be kept for audit logging or removed entirely
+Replace the current simple button with the hold-to-confirm ring from `PledgeScreen.tsx`. The copy adapts:
+
+- **Current button:** "Enter Kindred" (click)
+- **New interaction:** A 3-second hold ring with "Hold to Enter" label
+- On completion, text changes to "Entered" and auto-advances after 600ms
+- Subtext below: "For the certain. By conviction only." (replaces "For the certain. By audit only.")
+
+The progress ring SVG and hold logic from `PledgeScreen` moves into `LandingScreen`.
+
+## What Gets Removed
+
+- `PledgeScreen.tsx` -- deleted
+- `pledge` removed from the screen type union and flow in `Index.tsx`
+- All pledge-related routing and back-button wiring removed
+
+## What Gets Modified
+
+### `LandingScreen.tsx`
+- Import the hold logic (interval-based progress tracking) from the current Pledge implementation
+- Replace the `<button>` CTA with the circular progress ring + hold interaction
+- Keep existing headline, manifesto copy, and fade-up animations
+- Update bottom tagline from "By audit only" to "By conviction only"
+
+### `Index.tsx`
+- Remove `pledge` from the `Screen` type
+- Remove `PledgeScreen` import and rendering
+- Update flow: `stack` advances directly to `identity` (the new Google Sign-In screen)
+- Remove back-button wiring for the pledge step
 
 ## Technical Details
 
-**New send-otp flow:**
-```
-POST https://verify.twilio.com/v2/Services/{TWILIO_VERIFY_SERVICE_SID}/Verifications
-Body: To=+49..., Channel=sms
-Auth: Basic (AccountSID:AuthToken)
-```
+The hold mechanic is already built in `PledgeScreen.tsx` (lines 14-30):
+- 3000ms hold duration, 30ms tick interval
+- `onMouseDown`/`onTouchStart` starts the timer
+- `onMouseUp`/`onMouseLeave`/`onTouchEnd` resets if incomplete
+- SVG circle with `strokeDashoffset` for the progress ring
+- On completion: state flips to "complete," 600ms delay, then `onNext()`
 
-**New verify-otp flow:**
-```
-POST https://verify.twilio.com/v2/Services/{TWILIO_VERIFY_SERVICE_SID}/VerificationCheck
-Body: To=+49..., Code=123456
-Auth: Basic (AccountSID:AuthToken)
-Response: { status: "approved" | "pending" }
-```
-
-No changes needed to `TWILIO_PHONE_NUMBER` -- Twilio Verify uses its own sender infrastructure, so the "From number" issue goes away entirely.
-
-No frontend changes required -- the OTP screen already collects the phone number and 6-digit code.
+This logic transfers directly into `LandingScreen` with only copy changes.
 
