@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import LandingScreen from "@/components/screens/LandingScreen";
@@ -22,7 +22,7 @@ const BackButton = ({ onClick }: { onClick: () => void }) => (
 );
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [screen, setScreen] = useState<Screen>("landing");
   const [why, setWhy] = useState("");
   const [pillar, setPillar] = useState("");
@@ -30,46 +30,58 @@ const Index = () => {
   const [stack, setStack] = useState<[string, string, string]>(["", "", ""]);
   const [fadeKey, setFadeKey] = useState(0);
   const [matchCount, setMatchCount] = useState<number | null>(null);
+  const [checkingProfile, setCheckingProfile] = useState(false);
 
   const goTo = useCallback((s: Screen) => {
     setFadeKey((k) => k + 1);
     setScreen(s);
   }, []);
 
+  // Returning user check
+  useEffect(() => {
+    if (loading || !user) return;
+    setCheckingProfile(true);
+    supabase
+      .from("profiles")
+      .select("why, pillar, filters, stack, table_id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data && data.why) {
+          setWhy(data.why);
+          setPillar(data.pillar ?? "");
+          setFilters(data.filters ?? []);
+          setStack((data.stack as [string, string, string]) ?? ["", "", ""]);
+          goTo("outcome");
+        }
+        setCheckingProfile(false);
+      });
+  }, [user, loading, goTo]);
+
   const handleLandingNext = useCallback(() => {
     goTo("why");
   }, [goTo]);
 
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    setScreen("landing");
+    setFadeKey((k) => k + 1);
+  }, [signOut]);
+
   const saveProfileAndMatch = useCallback(async () => {
-    if (!user) {
-      console.log("Skipping save — no user");
-      return;
-    }
+    if (!user) return;
     try {
       const email = user.email ?? "";
-      const handle = email.split("@")[0]; // derive handle from email
+      const handle = email.split("@")[0];
 
       await supabase.from("profiles").upsert(
-        {
-          user_id: user.id,
-          email,
-          handle,
-          why,
-          pillar,
-          filters,
-          stack: stack as string[],
-        },
+        { user_id: user.id, email, handle, why, pillar, filters, stack: stack as string[] },
         { onConflict: "user_id" }
       );
 
-      const { data } = await supabase.functions.invoke("compute-matches", {
-        body: { handle },
-      });
-      if (data?.total !== undefined) {
-        setMatchCount(data.total);
-      }
+      const { data } = await supabase.functions.invoke("compute-matches", { body: { handle } });
+      if (data?.total !== undefined) setMatchCount(data.total);
 
-      // Fire-and-forget welcome email
       supabase.functions.invoke("send-welcome-email", {
         body: { email, name: user.user_metadata?.full_name || handle },
       }).catch(console.error);
@@ -78,7 +90,7 @@ const Index = () => {
     }
   }, [user, why, pillar, filters, stack]);
 
-  if (loading) {
+  if (loading || checkingProfile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <span className="gallery-label animate-pulse">Loading…</span>
@@ -89,9 +101,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div key={fadeKey} className="screen-fade">
-        {screen === "landing" && (
-          <LandingScreen onNext={handleLandingNext} />
-        )}
+        {screen === "landing" && <LandingScreen onNext={handleLandingNext} />}
         {screen === "why" && (
           <><BackButton onClick={() => goTo("landing")} />
           <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} /></>
@@ -116,7 +126,7 @@ const Index = () => {
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
         )}
         {screen === "outcome" && (
-          <OutcomeScreen matchCount={matchCount} />
+          <OutcomeScreen matchCount={matchCount} onSignOut={handleSignOut} />
         )}
       </div>
     </div>
