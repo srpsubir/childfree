@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      otp_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          verified: boolean
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          verified?: boolean
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          filters: string[] | null
+          handle: string
+          id: string
+          phone: string | null
+          pillar: string | null
+          stack: string[] | null
+          why: string | null
+        }
+        Insert: {
+          created_at?: string
+          filters?: string[] | null
+          handle: string
+          id?: string
+          phone?: string | null
+          pillar?: string | null
+          stack?: string[] | null
+          why?: string | null
+        }
+        Update: {
+          created_at?: string
+          filters?: string[] | null
+          handle?: string
+          id?: string
+          phone?: string | null
+          pillar?: string | null
+          stack?: string[] | null
+          why?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
