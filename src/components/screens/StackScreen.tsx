@@ -73,6 +73,10 @@ const StackScreen = ({ onNext }: Props) => {
         >
           Continue
         </button>
+
+        <p className="gallery-body text-sm text-muted-foreground/60 text-center animate-fade-up-delay-2">
+          Your answers shape the table you'll be seated at.
+        </p>
       </div>
     </div>
   );

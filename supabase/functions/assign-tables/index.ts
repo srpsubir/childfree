@@ -141,10 +141,19 @@ Deno.serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Accept optional event_id from request body
+    let eventId: string | null = null;
+    try {
+      const body = await req.json();
+      eventId = body?.event_id ?? null;
+    } catch {
+      // No body is fine
+    }
+
     // Fetch all unassigned profiles with complete data
     const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("id, handle, why, pillar, filters, stack")
+      .select("id, handle, why, pillar, filters, stack, user_id")
       .is("table_id", null)
       .not("why", "is", null)
       .not("pillar", "is", null);
@@ -170,10 +179,17 @@ Deno.serve(async (req) => {
     for (let i = 0; i < clusters.length; i++) {
       const cluster = clusters[i];
 
-      // Create the table record
+      // Create the table record, optionally linked to an event
+      const insertData: Record<string, unknown> = {
+        name: `Berlin — ${String.fromCharCode(65 + tablesCreated)}`,
+        city: "Berlin",
+        status: "forming",
+      };
+      if (eventId) insertData.event_id = eventId;
+
       const { data: tableRecord, error: tableErr } = await supabase
         .from("tables")
-        .insert({ name: `Berlin — ${String.fromCharCode(65 + tablesCreated)}`, city: "Berlin", status: "forming" })
+        .insert(insertData)
         .select("id")
         .single();
 
@@ -192,6 +208,22 @@ Deno.serve(async (req) => {
       if (updateErr) {
         console.error("Assign profiles error:", updateErr);
         continue;
+      }
+
+      // If event_id provided, create invitations for each profile
+      if (eventId) {
+        const invitationRows = cluster
+          .filter((p) => (p as Profile & { user_id?: string }).user_id)
+          .map((p) => ({
+            user_id: (p as Profile & { user_id: string }).user_id,
+            event_id: eventId,
+            status: "pending",
+          }));
+
+        if (invitationRows.length > 0) {
+          const { error: invErr } = await supabase.from("invitations").insert(invitationRows);
+          if (invErr) console.error("Create invitations error:", invErr);
+        }
       }
 
       tablesCreated++;

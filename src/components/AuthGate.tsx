@@ -30,7 +30,8 @@ const AuthGate = ({ onAuthenticated }: Props) => {
             Verify Identity.
           </h2>
           <p className="gallery-body text-muted-foreground leading-relaxed">
-            Sign in with Google to secure your seat.
+            Sign in to reserve your place at the table.<br />
+            Six people. One evening. No small talk.
           </p>
         </div>
 

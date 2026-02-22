@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          date: string
+          id: string
+          maps_link: string | null
+          max_seats: number
+          status: string
+          title: string
+          venue: string
+        }
+        Insert: {
+          address: string
+          city?: string
+          created_at?: string
+          date: string
+          id?: string
+          maps_link?: string | null
+          max_seats?: number
+          status?: string
+          title: string
+          venue: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          date?: string
+          id?: string
+          maps_link?: string | null
+          max_seats?: number
+          status?: string
+          title?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          event_id: string
+          id: string
+          invited_at: string
+          responded_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          invited_at?: string
+          responded_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          invited_at?: string
+          responded_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       otp_codes: {
         Row: {
           code_hash: string
@@ -98,6 +172,7 @@ export type Database = {
         Row: {
           city: string
           created_at: string
+          event_id: string | null
           id: string
           max_seats: number
           name: string
@@ -106,6 +181,7 @@ export type Database = {
         Insert: {
           city?: string
           created_at?: string
+          event_id?: string | null
           id?: string
           max_seats?: number
           name: string
@@ -114,12 +190,21 @@ export type Database = {
         Update: {
           city?: string
           created_at?: string
+          event_id?: string | null
           id?: string
           max_seats?: number
           name?: string
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tables_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

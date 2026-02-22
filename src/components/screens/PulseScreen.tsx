@@ -15,9 +15,9 @@ const PulseScreen = ({ onNext }: Props) => {
   }, [onNext]);
 
   const messages = [
-    "Authenticating intent...",
-    "Filtering for ambiguity...",
-    "Finalizing table placement...",
+    "Reading your signal...",
+    "Finding your people...",
+    "Preparing your Table...",
   ];
 
   return (

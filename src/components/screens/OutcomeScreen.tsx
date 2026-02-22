@@ -1,22 +1,59 @@
+import { useState, useEffect } from "react";
 import { Calendar, MapPin, Users, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   matchCount?: number | null;
+  onSignOut?: () => void;
 }
 
-const EVENT = {
-  title: "Kindred — The Berlin Table",
-  date: "Sat, 1 March",
-  time: "7:00 PM CET",
-  venue: "QBA, Berlin",
-  address: "Oranienburger Str. 45, 10117 Berlin",
-  mapsLink: "https://maps.app.goo.gl/mg9rYYWWQdxF83ey8",
-  description: "One table. Six strangers. No small talk. Your seat has been confirmed.",
-  // Google Calendar link: 1 March 2025, 19:00–22:00 CET (18:00–21:00 UTC)
-  calendarUrl: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Kindred — The Berlin Table")}&dates=20250301T180000Z/20250301T210000Z&location=${encodeURIComponent("QBA, Oranienburger Str. 45, 10117 Berlin")}&details=${encodeURIComponent("One table. Six strangers. No small talk.\n\nYour seat has been confirmed.\n\nVenue: https://maps.app.goo.gl/mg9rYYWWQdxF83ey8")}`,
-};
+function buildCalendarUrl(event: { title: string; date: string; venue: string; address: string; maps_link: string | null }) {
+  const start = new Date(event.date);
+  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const details = `One table. Six strangers. No small talk.\n\nYour seat has been confirmed.${event.maps_link ? `\n\nVenue: ${event.maps_link}` : ""}`;
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${fmt(start)}/${fmt(end)}&location=${encodeURIComponent(`${event.venue}, ${event.address}`)}&details=${encodeURIComponent(details)}`;
+}
 
-const OutcomeScreen = ({ matchCount }: Props) => {
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return {
+    display: d.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "long" }),
+    time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" }),
+  };
+}
+
+const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
+  const navigate = useNavigate();
+  const [event, setEvent] = useState<{
+    title: string; date: string; venue: string; address: string; maps_link: string | null; max_seats: number;
+  } | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("events")
+      .select("title, date, venue, address, maps_link, max_seats")
+      .eq("status", "upcoming")
+      .order("date", { ascending: true })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setEvent(data);
+      });
+  }, []);
+
+  if (!event) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+        <span className="gallery-label animate-pulse">Loading event…</span>
+      </div>
+    );
+  }
+
+  const { display, time } = formatDate(event.date);
+  const calendarUrl = buildCalendarUrl(event);
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-lg space-y-12 animate-fade-up text-center">
@@ -28,31 +65,29 @@ const OutcomeScreen = ({ matchCount }: Props) => {
           </span>
 
           <h2 className="gallery-heading text-4xl md:text-5xl font-semibold text-foreground">
-            The Berlin Table.
+            {event.title.replace("Kindred — ", "")}
           </h2>
 
           <p className="gallery-body text-muted-foreground max-w-sm mx-auto leading-relaxed">
-            {EVENT.description}
+            One table. Six strangers. No small talk. Your seat has been confirmed.
           </p>
         </div>
 
         {/* Invitation Card */}
         <div className="border border-border bg-card p-8 space-y-0 text-left animate-fade-up-delay">
-          {/* Date */}
           <div className="flex items-center justify-between py-5">
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="gallery-label">Date</span>
             </div>
             <div className="text-right">
-              <span className="font-body text-sm text-foreground">{EVENT.date}</span>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{EVENT.time}</p>
+              <span className="font-body text-sm text-foreground">{display}</span>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{time}</p>
             </div>
           </div>
 
           <div className="h-px bg-border" />
 
-          {/* Location */}
           <div className="flex items-center justify-between py-5">
             <div className="flex items-center gap-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -60,30 +95,27 @@ const OutcomeScreen = ({ matchCount }: Props) => {
             </div>
             <div className="text-right">
               <a
-                href={EVENT.mapsLink}
+                href={event.maps_link ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-body text-sm text-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
               >
-                {EVENT.venue}
+                {event.venue}
                 <ExternalLink className="h-3 w-3" />
               </a>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">
-                {EVENT.address}
-              </p>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{event.address}</p>
             </div>
           </div>
 
           <div className="h-px bg-border" />
 
-          {/* Seats */}
           <div className="flex items-center justify-between py-5">
             <div className="flex items-center gap-3">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="gallery-label">Seats</span>
             </div>
             <div className="text-right">
-              <span className="font-body text-sm text-foreground">6</span>
+              <span className="font-body text-sm text-foreground">{event.max_seats}</span>
               <p className="font-body text-[11px] text-muted-foreground mt-0.5">Matched by conviction</p>
             </div>
           </div>
@@ -98,13 +130,34 @@ const OutcomeScreen = ({ matchCount }: Props) => {
 
         {/* CTA — Google Calendar */}
         <a
-          href={EVENT.calendarUrl}
+          href={calendarUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 animate-fade-up-delay-2 text-center"
         >
           Add to Google Calendar
         </a>
+
+        {/* View All + Sign Out */}
+        <div className="flex items-center justify-center gap-6 animate-fade-up-delay-2">
+          <button
+            onClick={() => navigate("/account")}
+            className="gallery-label text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            My Tables
+          </button>
+          {onSignOut && (
+            <>
+              <span className="text-border">·</span>
+              <button
+                onClick={onSignOut}
+                className="gallery-label text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                Sign out
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
