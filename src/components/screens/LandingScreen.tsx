@@ -58,8 +58,8 @@ const LandingScreen = ({ onNext }: Props) => {
               <circle
                 cx="64" cy="64" r="58"
                 fill="none"
-                className="stroke-border"
-                strokeWidth="1"
+                className="stroke-primary/40"
+                strokeWidth="2"
               />
               <circle
                 cx="64" cy="64" r="58"
@@ -84,6 +84,11 @@ const LandingScreen = ({ onNext }: Props) => {
               {complete ? "Entered" : "Hold to Enter"}
             </button>
           </div>
+          {!complete && (
+            <p className="gallery-label text-muted-foreground/60 text-[10px] animate-pulse">
+              Press and hold
+            </p>
+          )}
         </div>
 
       </div>

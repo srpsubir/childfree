@@ -28,7 +28,7 @@ const FilterScreen = ({ onNext }: Props) => {
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-lg space-y-10 animate-fade-up">
         <div className="space-y-4 text-center">
-          <p className="gallery-label">Step V — The Filter</p>
+          <p className="gallery-label">Step 3</p>
           <h2 className="gallery-heading text-3xl sm:text-4xl font-semibold text-foreground">
             What you refuse to tolerate.
           </h2>
@@ -60,7 +60,7 @@ const FilterScreen = ({ onNext }: Props) => {
           <button
             disabled={selected.length < 2}
             onClick={() => onNext(selected)}
-            className="w-full border border-primary bg-primary p-4 text-center font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full border border-primary bg-transparent px-5 py-4 font-body text-xs uppercase tracking-[0.3em] text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Continue
           </button>
