@@ -1,17 +1,14 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import LandingScreen from "@/components/screens/LandingScreen";
-import AuditScreen from "@/components/screens/AuditScreen";
-import OTPScreen from "@/components/screens/OTPScreen";
 import WhyScreen from "@/components/screens/WhyScreen";
 import PillarScreen from "@/components/screens/PillarScreen";
 import FilterScreen from "@/components/screens/FilterScreen";
 import StackScreen from "@/components/screens/StackScreen";
-import PledgeScreen from "@/components/screens/PledgeScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
 
-type Screen = "landing" | "audit" | "otp" | "why" | "pillar" | "filter" | "stack" | "pledge" | "pulse" | "outcome";
+type Screen = "landing" | "why" | "pillar" | "filter" | "stack" | "pulse" | "outcome";
 
 const BackButton = ({ onClick }: { onClick: () => void }) => (
   <button
@@ -40,7 +37,6 @@ const Index = () => {
 
   const saveProfileAndMatch = useCallback(async () => {
     try {
-      // Save profile
       await supabase.from("profiles").upsert(
         {
           handle,
@@ -53,7 +49,6 @@ const Index = () => {
         { onConflict: "handle" }
       );
 
-      // Compute matches
       const { data } = await supabase.functions.invoke("compute-matches", {
         body: { handle },
       });
@@ -69,18 +64,10 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground">
       <div key={fadeKey} className="screen-fade">
         {screen === "landing" && (
-          <LandingScreen onNext={() => goTo("audit")} />
-        )}
-        {screen === "audit" && (
-          <><BackButton onClick={() => goTo("landing")} />
-          <AuditScreen onNext={(h) => { setHandle(h); goTo("otp"); }} /></>
-        )}
-        {screen === "otp" && (
-          <><BackButton onClick={() => goTo("audit")} />
-          <OTPScreen onNext={(p) => { setPhone(p); goTo("why"); }} /></>
+          <LandingScreen onNext={() => goTo("why")} />
         )}
         {screen === "why" && (
-          <><BackButton onClick={() => goTo("otp")} />
+          <><BackButton onClick={() => goTo("landing")} />
           <WhyScreen onNext={(w) => { setWhy(w); goTo("pillar"); }} /></>
         )}
         {screen === "pillar" && (
@@ -93,11 +80,7 @@ const Index = () => {
         )}
         {screen === "stack" && (
           <><BackButton onClick={() => goTo("filter")} />
-          <StackScreen onNext={(s) => { setStack(s); goTo("pledge"); }} /></>
-        )}
-        {screen === "pledge" && (
-          <><BackButton onClick={() => goTo("stack")} />
-          <PledgeScreen onNext={() => goTo("pulse")} /></>
+          <StackScreen onNext={(s) => { setStack(s); goTo("pulse"); }} /></>
         )}
         {screen === "pulse" && (
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
