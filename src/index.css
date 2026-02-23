@@ -47,12 +47,14 @@
 
     --font-display: 'Playfair Display', Georgia, serif;
     --font-body: 'Inter', system-ui, sans-serif;
+
+    --card-border-idle: 36 71% 88%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border rounded-none;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -60,13 +62,17 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    @apply leading-none;
+  }
+  button, a, input, select, textarea {
+    @apply rounded-none;
   }
 }
 
 @layer components {
   .gallery-heading {
     font-family: var(--font-display);
-    @apply tracking-tight;
+    @apply tracking-tight leading-none;
   }
   .gallery-body {
     font-family: var(--font-body);
@@ -75,6 +81,30 @@
   .gallery-label {
     font-family: var(--font-body);
     @apply text-xs uppercase tracking-[0.3em] text-muted-foreground;
+  }
+  .gallery-micro {
+    font-family: var(--font-body);
+    @apply text-[10px] uppercase tracking-widest text-muted-foreground;
+  }
+  .editorial-input {
+    @apply w-full bg-transparent border-0 border-b border-muted-foreground/30 rounded-none px-0 py-4 font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 transition-colors duration-300;
+  }
+  .editorial-input:focus {
+    border-color: hsl(var(--primary));
+  }
+  .editorial-card {
+    @apply border rounded-none transition-all duration-300;
+    border-color: hsl(var(--card-border-idle) / 0.2);
+  }
+  .editorial-card.selected {
+    border-color: hsl(var(--primary));
+    @apply bg-primary/5;
+  }
+  .editorial-btn-outline {
+    @apply w-full border border-primary bg-transparent px-8 py-4 font-body text-xs uppercase tracking-widest text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed rounded-none;
+  }
+  .editorial-btn-filled {
+    @apply w-full bg-primary text-primary-foreground px-8 py-4 font-body text-xs uppercase tracking-widest transition-all duration-300 hover:opacity-90 disabled:opacity-50 rounded-none;
   }
 }
 
@@ -114,6 +144,6 @@
     100% { opacity: 1; }
   }
   .screen-fade {
-    animation: screen-fade-in 0.8s ease-out forwards;
+    animation: screen-fade-in 0.8s ease-in-out forwards;
   }
 }

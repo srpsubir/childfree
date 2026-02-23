@@ -21,12 +21,12 @@ const PulseScreen = ({ onNext }: Props) => {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
       <div className="relative flex items-center justify-center">
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="absolute rounded-full border border-primary/30"
+            className="absolute border border-primary/30"
             style={{
               width: 120 + i * 80,
               height: 120 + i * 80,
@@ -35,19 +35,19 @@ const PulseScreen = ({ onNext }: Props) => {
           />
         ))}
         <div
-          className="absolute w-16 h-16 rounded-full border border-primary/60"
+          className="absolute w-16 h-16 border border-primary/60"
           style={{ animation: "integrity-ring 2s ease-out infinite" }}
         />
-        <div className="w-3 h-3 rounded-full bg-primary" />
+        <div className="w-3 h-3 bg-primary" />
       </div>
 
-      <div className="mt-24 text-center space-y-2">
-        <p className="gallery-body text-foreground transition-opacity duration-500">
+      <div className="mt-28 text-center space-y-3">
+        <p className="gallery-body text-foreground transition-opacity duration-800 ease-in-out">
           {messages[phase]}
         </p>
-        <p className="gallery-label">Kindred verification in progress</p>
+        <p className="gallery-micro">Kindred verification in progress</p>
         {phase === 2 && (
-        <p className="gallery-body text-sm text-muted-foreground/70 mt-4 transition-opacity duration-700 animate-fade-up">
+          <p className="gallery-body text-sm text-muted-foreground/70 mt-6 transition-opacity duration-800 ease-in-out animate-fade-up">
             Preparing your Table — a private circle of people matched to your conviction and values. You'll meet in person.
           </p>
         )}

@@ -32,14 +32,14 @@ const LandingScreen = ({ onNext }: Props) => {
   }, [complete]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md space-y-10 text-center animate-fade-up">
-        <h1 className="gallery-heading text-5xl sm:text-6xl font-semibold text-foreground tracking-tight">
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="w-full max-w-md space-y-14 text-center animate-fade-up">
+        <h1 className="gallery-heading text-5xl sm:text-6xl font-semibold text-foreground">
           Kindred
         </h1>
 
         <div className="space-y-2">
-          <p className="gallery-heading text-xl sm:text-2xl text-foreground/80 leading-relaxed">
+          <p className="gallery-heading text-xl sm:text-2xl text-foreground/80 leading-tight">
             Done explaining.<br />
             Done compromising.<br />
             Done searching.
@@ -52,20 +52,20 @@ const LandingScreen = ({ onNext }: Props) => {
           No ambiguity. No bait-and-switch.
         </p>
 
-        <div className="flex flex-col items-center space-y-6 animate-fade-up-delay-2">
+        <div className="flex flex-col items-center space-y-8 animate-fade-up-delay-2">
           <div className="relative">
-            <svg className="w-32 h-32" viewBox="0 0 128 128">
+            <svg className="w-36 h-36" viewBox="0 0 128 128">
               <circle
                 cx="64" cy="64" r="58"
                 fill="none"
                 className="stroke-primary/40"
-                strokeWidth="2"
+                strokeWidth="1.5"
               />
               <circle
                 cx="64" cy="64" r="58"
                 fill="none"
                 className="stroke-primary"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeDasharray={`${2 * Math.PI * 58}`}
                 strokeDashoffset={`${2 * Math.PI * 58 * (1 - progress / 100)}`}
                 style={{ transition: "stroke-dashoffset 0.05s linear", transform: "rotate(-90deg)", transformOrigin: "center" }}
@@ -77,7 +77,7 @@ const LandingScreen = ({ onNext }: Props) => {
               onMouseLeave={endHold}
               onTouchStart={startHold}
               onTouchEnd={endHold}
-              className={`absolute inset-0 flex items-center justify-center font-body text-[10px] uppercase tracking-[0.15em] whitespace-nowrap transition-colors ${
+              className={`absolute inset-0 flex items-center justify-center gallery-micro whitespace-nowrap transition-colors duration-300 px-8 py-4 ${
                 complete ? "text-primary" : "text-muted-foreground"
               }`}
             >
@@ -85,7 +85,7 @@ const LandingScreen = ({ onNext }: Props) => {
             </button>
           </div>
           {!complete && (
-            <p className="gallery-label text-muted-foreground/60 text-[10px] animate-pulse">
+            <p className="gallery-micro text-muted-foreground/60 animate-pulse">
               Press and hold
             </p>
           )}
