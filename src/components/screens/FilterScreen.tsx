@@ -25,10 +25,10 @@ const FilterScreen = ({ onNext }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-lg space-y-10 animate-fade-up">
-        <div className="space-y-4 text-center">
-          <p className="gallery-label">Step 3</p>
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="w-full max-w-lg space-y-12 animate-fade-up">
+        <div className="space-y-5 text-center">
+          <p className="gallery-micro">Step 3</p>
           <h2 className="gallery-heading text-3xl sm:text-4xl font-semibold text-foreground">
             What you refuse to tolerate.
           </h2>
@@ -44,10 +44,8 @@ const FilterScreen = ({ onNext }: Props) => {
               <button
                 key={a.id}
                 onClick={() => toggle(a.id)}
-                className={`w-full border p-4 text-left transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
+                className={`editorial-card w-full p-5 text-left ${
+                  isSelected ? "selected text-foreground" : "text-muted-foreground hover:border-muted-foreground/30"
                 }`}
               >
                 <span className="gallery-body text-sm">{a.label}</span>
@@ -60,12 +58,12 @@ const FilterScreen = ({ onNext }: Props) => {
           <button
             disabled={selected.length < 2}
             onClick={() => onNext(selected)}
-            className="w-full border border-primary bg-transparent px-5 py-4 font-body text-xs uppercase tracking-[0.3em] text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+            className="editorial-btn-outline"
           >
             Continue
           </button>
           {selected.length < 2 && (
-            <p className="mt-3 text-center text-xs text-muted-foreground">
+            <p className="mt-4 text-center gallery-micro text-muted-foreground/60">
               Select at least 2 to continue
             </p>
           )}

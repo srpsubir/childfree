@@ -19,13 +19,12 @@ const AuthGate = ({ onAuthenticated }: Props) => {
       setError("Sign-in failed. Please try again.");
       setLoading(false);
     }
-    // On success, the page redirects — onAuthStateChange in useAuth picks up the session
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm space-y-10 text-center animate-fade-up">
-        <div className="space-y-4">
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="w-full max-w-sm space-y-12 text-center animate-fade-up">
+        <div className="space-y-5">
           <h2 className="gallery-heading text-3xl md:text-4xl font-semibold text-foreground">
             Verify Identity.
           </h2>
@@ -38,7 +37,7 @@ const AuthGate = ({ onAuthenticated }: Props) => {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-3"
+          className="editorial-btn-filled flex items-center justify-center gap-3"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -62,7 +61,7 @@ const AuthGate = ({ onAuthenticated }: Props) => {
         </button>
 
         {error && (
-          <p className="font-body text-xs text-destructive">{error}</p>
+          <p className="gallery-micro text-destructive">{error}</p>
         )}
       </div>
     </div>

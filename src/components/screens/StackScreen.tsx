@@ -24,10 +24,10 @@ const StackScreen = ({ onNext }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-lg space-y-10 animate-fade-up">
-        <div className="space-y-4 text-center">
-          <p className="gallery-label">Step 4</p>
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="w-full max-w-lg space-y-12 animate-fade-up">
+        <div className="space-y-5 text-center">
+          <p className="gallery-micro">Step 4</p>
           <h2 className="gallery-heading text-3xl sm:text-4xl font-semibold text-foreground">
             Rank what matters most for your childfree life.
           </h2>
@@ -44,10 +44,8 @@ const StackScreen = ({ onNext }: Props) => {
               <button
                 key={v.id}
                 onClick={() => toggle(v.id)}
-                className={`relative w-full border p-5 text-left transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:border-muted-foreground"
+                className={`editorial-card relative w-full p-7 text-left ${
+                  isSelected ? "selected" : "hover:border-muted-foreground/30"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -69,12 +67,12 @@ const StackScreen = ({ onNext }: Props) => {
         <button
           onClick={() => ranked.length === 3 && onNext(ranked as [string, string, string])}
           disabled={ranked.length !== 3}
-          className="w-full border border-primary bg-transparent px-5 py-4 font-body text-xs uppercase tracking-[0.3em] text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed animate-fade-up-delay-2"
+          className="editorial-btn-outline animate-fade-up-delay-2"
         >
           Continue
         </button>
 
-        <p className="gallery-body text-sm text-muted-foreground/60 text-center animate-fade-up-delay-2">
+        <p className="gallery-micro text-muted-foreground/60 text-center animate-fade-up-delay-2">
           Your answers shape the table you'll be seated at.
         </p>
       </div>

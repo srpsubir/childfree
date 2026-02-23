@@ -45,8 +45,8 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
 
   if (!event) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-        <span className="gallery-label animate-pulse">Loading event…</span>
+      <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+        <span className="gallery-micro animate-pulse">Loading event…</span>
       </div>
     );
   }
@@ -55,12 +55,12 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
   const calendarUrl = buildCalendarUrl(event);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-lg space-y-12 animate-fade-up text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="w-full max-w-lg space-y-14 animate-fade-up text-center">
         {/* Status Badge */}
-        <div className="space-y-6">
-          <span className="inline-flex items-center gap-2 border border-primary px-4 py-1.5 font-body text-[10px] uppercase tracking-[0.2em] text-primary animate-fade-up">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+        <div className="space-y-8">
+          <span className="inline-flex items-center gap-2 border border-primary px-5 py-2 gallery-micro text-primary animate-fade-up">
+            <span className="w-1.5 h-1.5 bg-primary" />
             Seat Confirmed
           </span>
 
@@ -74,55 +74,55 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
         </div>
 
         {/* Invitation Card */}
-        <div className="border border-border bg-card p-8 space-y-0 text-left animate-fade-up-delay">
-          <div className="flex items-center justify-between py-5">
+        <div className="border border-border bg-card p-10 space-y-0 text-left animate-fade-up-delay">
+          <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="gallery-label">Date</span>
+              <span className="gallery-micro">Date</span>
             </div>
             <div className="text-right">
-              <span className="font-body text-sm text-foreground">{display}</span>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{time}</p>
+              <span className="gallery-body text-sm text-foreground">{display}</span>
+              <p className="gallery-micro mt-1">{time}</p>
             </div>
           </div>
 
           <div className="h-px bg-border" />
 
-          <div className="flex items-center justify-between py-5">
+          <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="gallery-label">Location</span>
+              <span className="gallery-micro">Location</span>
             </div>
             <div className="text-right">
               <a
                 href={event.maps_link ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-body text-sm text-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                className="gallery-body text-sm text-foreground hover:text-primary transition-colors duration-300 inline-flex items-center gap-1.5"
               >
                 {event.venue}
                 <ExternalLink className="h-3 w-3" />
               </a>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">{event.address}</p>
+              <p className="gallery-micro mt-1">{event.address}</p>
             </div>
           </div>
 
           <div className="h-px bg-border" />
 
-          <div className="flex items-center justify-between py-5">
+          <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-3">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="gallery-label">Seats</span>
+              <span className="gallery-micro">Seats</span>
             </div>
             <div className="text-right">
-              <span className="font-body text-sm text-foreground">{event.max_seats}</span>
-              <p className="font-body text-[11px] text-muted-foreground mt-0.5">Matched by conviction</p>
+              <span className="gallery-body text-sm text-foreground">{event.max_seats}</span>
+              <p className="gallery-micro mt-1">Matched by conviction</p>
             </div>
           </div>
         </div>
 
         {/* Status */}
-        <p className="gallery-label text-muted-foreground animate-fade-up-delay">
+        <p className="gallery-micro text-muted-foreground animate-fade-up-delay">
           {matchCount !== null && matchCount !== undefined && matchCount > 0
             ? `${matchCount} potential match${matchCount === 1 ? "" : "es"} found`
             : "Your table is being assembled"}
@@ -133,16 +133,16 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
           href={calendarUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full bg-primary text-primary-foreground px-5 py-4 font-body text-xs uppercase tracking-[0.3em] transition-all hover:opacity-90 animate-fade-up-delay-2 text-center"
+          className="editorial-btn-filled block text-center animate-fade-up-delay-2"
         >
           Add to Google Calendar
         </a>
 
         {/* View All + Sign Out */}
-        <div className="flex items-center justify-center gap-6 animate-fade-up-delay-2">
+        <div className="flex items-center justify-center gap-8 animate-fade-up-delay-2">
           <button
             onClick={() => navigate("/account")}
-            className="gallery-label text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="gallery-micro text-muted-foreground hover:text-foreground transition-colors duration-300 cursor-pointer"
           >
             My Tables
           </button>
@@ -151,7 +151,7 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
               <span className="text-border">·</span>
               <button
                 onClick={onSignOut}
-                className="gallery-label text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="gallery-micro text-muted-foreground hover:text-foreground transition-colors duration-300 cursor-pointer"
               >
                 Sign out
               </button>
