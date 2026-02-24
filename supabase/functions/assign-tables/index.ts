@@ -44,6 +44,8 @@ interface Profile {
   pillar: string;
   filters: string[];
   stack: string[];
+  user_id?: string;
+  email?: string;
 }
 
 function computeScore(a: Profile, b: Profile): number {
@@ -130,6 +132,128 @@ function clusterTables(profiles: Profile[], tableSize = 6): Profile[][] {
   return tables;
 }
 
+// ── Email helpers ──────────────────────────────────────────────────────
+interface EventDetails {
+  title: string;
+  date: string;
+  venue: string;
+  address: string;
+  maps_link?: string;
+}
+
+function buildCalendarUrl(event: EventDetails): string {
+  const start = new Date(event.date);
+  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+  const fmt = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const details =
+    `One table. Six strangers. No small talk.\n\nYour seat has been confirmed.` +
+    (event.maps_link ? `\n\nVenue: ${event.maps_link}` : "");
+  return (
+    `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+    `&text=${encodeURIComponent(event.title)}` +
+    `&dates=${fmt(start)}/${fmt(end)}` +
+    `&location=${encodeURIComponent(`${event.venue}, ${event.address}`)}` +
+    `&details=${encodeURIComponent(details)}`
+  );
+}
+
+function formatEventDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  try {
+    const fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Berlin",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const parts = fmt.formatToParts(d);
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+    return `${get("weekday")}, ${get("day")} ${get("month")} · ${get("hour")}:${get("minute")} CET`;
+  } catch {
+    return dateStr;
+  }
+}
+
+function buildEmailHtml(
+  handle: string | undefined,
+  event: EventDetails,
+  calendarUrl: string,
+): string {
+  const formattedDate = formatEventDate(event.date);
+  return `
+    <div style="font-family: 'Inter', system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; color: #f5f5f4;">
+      <div style="background: #171717; padding: 32px; border: 1px solid #2a2a2a;">
+        <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; margin: 0 0 16px;">
+          ${event.title}.
+        </h1>
+        <p style="color: #8a8a8a; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+          Hey ${handle || "there"},<br/><br/>
+          Your seat has been confirmed. One table. Six strangers. No small talk.
+        </p>
+        <div style="border-top: 1px solid #2a2a2a; padding-top: 16px; font-size: 13px; color: #8a8a8a;">
+          <p style="margin: 4px 0;"><strong style="color: #f5f5f4;">When:</strong> ${formattedDate}</p>
+          <p style="margin: 4px 0;"><strong style="color: #f5f5f4;">Where:</strong> ${event.venue}, ${event.address}</p>
+        </div>
+        <a href="${calendarUrl}" style="display: inline-block; margin-top: 24px; padding: 12px 24px; background: #e8d5b7; color: #171717; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em;">
+          Add to Calendar
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+// deno-lint-ignore no-explicit-any
+async function sendInvitationEmail(
+  supabase: ReturnType<typeof createClient>,
+  profile: Profile,
+  event: EventDetails,
+  resendApiKey: string,
+): Promise<void> {
+  // Prefer email stored on the profile row; fall back to auth user record
+  let email = profile.email;
+  if (!email && profile.user_id) {
+    try {
+      const { data } = await supabase.auth.admin.getUserById(profile.user_id);
+      email = data.user?.email;
+    } catch (e) {
+      console.error(`Failed to look up email for user ${profile.user_id}:`, e);
+      return;
+    }
+  }
+  if (!email) return;
+
+  const calendarUrl = buildCalendarUrl(event);
+  const html = buildEmailHtml(profile.handle, event, calendarUrl);
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: "Kindred <onboarding@resend.dev>",
+        to: [email],
+        subject: `Your seat is confirmed — ${event.title}`,
+        html,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error(`Resend error for ${email}:`, err);
+    } else {
+      console.log(`Invitation email sent to ${email}`);
+    }
+  } catch (e) {
+    console.error(`Failed to send email to ${email}:`, e);
+  }
+}
+
 // ── HTTP handler ───────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -139,6 +263,7 @@ Deno.serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Accept optional event_id from request body
@@ -153,7 +278,7 @@ Deno.serve(async (req) => {
     // Fetch all unassigned profiles with complete data
     const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("id, handle, why, pillar, filters, stack, user_id")
+      .select("id, handle, why, pillar, filters, stack, user_id, email")
       .is("table_id", null)
       .not("why", "is", null)
       .not("pillar", "is", null);
@@ -173,8 +298,24 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Fetch event details once if an event_id was supplied
+    let eventDetails: EventDetails | null = null;
+    if (eventId) {
+      const { data: event, error: eventErr } = await supabase
+        .from("events")
+        .select("title, date, venue, address, maps_link")
+        .eq("id", eventId)
+        .single();
+      if (eventErr) {
+        console.error("Fetch event error:", eventErr);
+      } else {
+        eventDetails = event as EventDetails;
+      }
+    }
+
     const clusters = clusterTables(profiles as Profile[]);
     let tablesCreated = 0;
+    const emailTasks: Promise<void>[] = [];
 
     for (let i = 0; i < clusters.length; i++) {
       const cluster = clusters[i];
@@ -213,20 +354,36 @@ Deno.serve(async (req) => {
       // If event_id provided, create invitations for each profile
       if (eventId) {
         const invitationRows = cluster
-          .filter((p) => (p as Profile & { user_id?: string }).user_id)
+          .filter((p) => p.user_id)
           .map((p) => ({
-            user_id: (p as Profile & { user_id: string }).user_id,
+            user_id: p.user_id!,
             event_id: eventId,
             status: "pending",
           }));
 
         if (invitationRows.length > 0) {
           const { error: invErr } = await supabase.from("invitations").insert(invitationRows);
-          if (invErr) console.error("Create invitations error:", invErr);
+          if (invErr) {
+            console.error("Create invitations error:", invErr);
+          }
+        }
+
+        // Queue invitation emails — errors are caught inside sendInvitationEmail
+        if (eventDetails && RESEND_API_KEY) {
+          for (const profile of cluster) {
+            emailTasks.push(
+              sendInvitationEmail(supabase, profile, eventDetails, RESEND_API_KEY),
+            );
+          }
         }
       }
 
       tablesCreated++;
+    }
+
+    // Send all emails concurrently; individual failures are already logged inside
+    if (emailTasks.length > 0) {
+      await Promise.allSettled(emailTasks);
     }
 
     return new Response(
