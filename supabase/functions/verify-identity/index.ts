@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
       const { error: updateError } = await adminClient
         .from("profiles")
         .update({ verified: true, verified_at: new Date().toISOString() })
-        .eq("id", user_id);
+        .eq("user_id", user_id);
 
       if (updateError) {
         console.error("Profile update error:", updateError);
