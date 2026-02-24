@@ -25,7 +25,7 @@ const FilterScreen = ({ onNext }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 3</p>
@@ -44,7 +44,7 @@ const FilterScreen = ({ onNext }: Props) => {
               <button
                 key={a.id}
                 onClick={() => toggle(a.id)}
-                className={`editorial-card w-full p-5 text-left ${
+                className={`editorial-card w-full p-4 sm:p-5 text-left ${
                   isSelected ? "selected text-foreground" : "text-muted-foreground hover:border-muted-foreground/30"
                 }`}
               >

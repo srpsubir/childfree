@@ -32,7 +32,7 @@ const LandingScreen = ({ onNext }: Props) => {
   }, [complete]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
       <div className="w-full max-w-md space-y-14 text-center animate-fade-up">
         <h1 className="gallery-heading text-5xl sm:text-6xl font-semibold text-foreground">
           Kindred

@@ -208,7 +208,7 @@ function buildEmailHtml(
 
 // deno-lint-ignore no-explicit-any
 async function sendInvitationEmail(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   profile: Profile,
   event: EventDetails,
   resendApiKey: string,

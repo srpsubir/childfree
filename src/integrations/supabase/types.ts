@@ -308,15 +308,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_mutual_connect_emails: {
-        Args: Record<string, never>
-        Returns: {
-          event_id: string
-          user_id: string
-          handle: string
-          email: string
-        }[]
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

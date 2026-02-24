@@ -24,7 +24,7 @@ const StackScreen = ({ onNext }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 4</p>
@@ -44,7 +44,7 @@ const StackScreen = ({ onNext }: Props) => {
               <button
                 key={v.id}
                 onClick={() => toggle(v.id)}
-                className={`editorial-card relative w-full p-5 md:p-7 text-left ${
+                className={`editorial-card relative w-full p-4 sm:p-5 md:p-7 text-left ${
                   isSelected ? "selected" : "hover:border-muted-foreground/30"
                 }`}
               >
