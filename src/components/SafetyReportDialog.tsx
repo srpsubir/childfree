@@ -75,7 +75,7 @@ export default function SafetyReportDialog({
   async function handleSubmit() {
     if (!selectedUserId || !category) return;
     setSubmitting(true);
-    const { error } = await supabase.from("safety_reports").insert({
+    const { error } = await (supabase.from as any)("safety_reports").insert({
       reporter_id: reporterId,
       reported_user_id: selectedUserId,
       event_id: eventId,

@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      connect_requests: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          requester_id: string
+          target_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          requester_id: string
+          target_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          requester_id?: string
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connect_requests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string
@@ -170,6 +202,47 @@ export type Database = {
             columns: ["table_id"]
             isOneToOne: false
             referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safety_reports: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          event_id: string
+          id: string
+          reported_user_id: string
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          reported_user_id: string
+          reporter_id: string
+          status?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          reported_user_id?: string
+          reporter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "safety_reports_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]

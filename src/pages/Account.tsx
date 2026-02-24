@@ -113,22 +113,19 @@ const Account = () => {
       }
 
       // 3. Get safety reports submitted by user for past events
-      const { data: reportsData } = await supabase
-        .from("safety_reports")
+      const { data: reportsData } = await (supabase.from as any)("safety_reports")
         .select("reported_user_id, event_id")
         .eq("reporter_id", user!.id)
         .in("event_id", pastEventIds);
 
       // 4. Get connect_requests sent by user for past events
-      const { data: sentData } = await supabase
-        .from("connect_requests")
+      const { data: sentData } = await (supabase.from as any)("connect_requests")
         .select("target_id, event_id")
         .eq("requester_id", user!.id)
         .in("event_id", pastEventIds);
 
       // 5. Get connect_requests received by user for past events
-      const { data: receivedData } = await supabase
-        .from("connect_requests")
+      const { data: receivedData } = await (supabase.from as any)("connect_requests")
         .select("requester_id, event_id")
         .eq("target_id", user!.id)
         .in("event_id", pastEventIds);
@@ -138,15 +135,15 @@ const Account = () => {
       for (const eventId of pastEventIds) {
         byEvent[eventId] = {
           tablemates: tablemateList,
-          reportedUserIds: (reportsData ?? [])
-            .filter((r: { reported_user_id: string; event_id: string }) => r.event_id === eventId)
-            .map((r: { reported_user_id: string; event_id: string }) => r.reported_user_id),
-          sentConnectIds: (sentData ?? [])
-            .filter((r: { target_id: string; event_id: string }) => r.event_id === eventId)
-            .map((r: { target_id: string; event_id: string }) => r.target_id),
-          receivedConnectIds: (receivedData ?? [])
-            .filter((r: { requester_id: string; event_id: string }) => r.event_id === eventId)
-            .map((r: { requester_id: string; event_id: string }) => r.requester_id),
+          reportedUserIds: ((reportsData ?? []) as any[])
+            .filter((r: any) => r.event_id === eventId)
+            .map((r: any) => r.reported_user_id),
+          sentConnectIds: ((sentData ?? []) as any[])
+            .filter((r: any) => r.event_id === eventId)
+            .map((r: any) => r.target_id),
+          receivedConnectIds: ((receivedData ?? []) as any[])
+            .filter((r: any) => r.event_id === eventId)
+            .map((r: any) => r.requester_id),
         };
       }
 
