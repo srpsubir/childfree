@@ -53,7 +53,11 @@ const Index = () => {
           setPillar(data.pillar ?? "");
           setFilters(data.filters ?? []);
           setStack((data.stack as [string, string, string]) ?? ["", "", ""]);
-          goTo("outcome");
+          if (data.verified) {
+            goTo("outcome");
+          } else {
+            goTo("verify");
+          }
         }
         setCheckingProfile(false);
       });
