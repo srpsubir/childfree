@@ -3,6 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Profile {
   id: string;
@@ -37,10 +44,21 @@ const STATUS_STYLES: Record<string, string> = {
   dismissed: "text-destructive",
 };
 
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  venue: string | null;
+  status: string | null;
+}
+
+
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [assigning, setAssigning] = useState(false);
@@ -78,16 +96,24 @@ const Admin = () => {
   useEffect(() => {
     if (!isAdmin) return;
 
-    const fetchProfiles = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, email, handle, why, pillar, filters, stack, table_id, created_at")
-        .order("created_at", { ascending: false });
-      setProfiles(data ?? []);
+    const fetchData = async () => {
+      const [profilesRes, eventsRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, email, handle, why, pillar, filters, stack, table_id, created_at")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("events")
+          .select("id, title, date, venue, status")
+          .order("date", { ascending: false }),
+      ]);
+
+      setProfiles(profilesRes.data ?? []);
+      setEvents(eventsRes.data ?? []);
       setLoading(false);
     };
 
-    fetchProfiles();
+    fetchData();
   }, [isAdmin]);
 
   useEffect(() => {
@@ -170,12 +196,24 @@ const Admin = () => {
   };
 
   const triggerAssignTables = async () => {
+    if (!selectedEventId) {
+      toast.warning("Please select an event before assigning tables.");
+      return;
+    }
+
     setAssigning(true);
     setAssignResult("");
     try {
-      const { data, error } = await supabase.functions.invoke("assign-tables");
+      const { data, error } = await supabase.functions.invoke("assign-tables", {
+        body: { event_id: selectedEventId },
+      });
       if (error) throw error;
-      setAssignResult(`Done: ${data?.tables_created ?? 0} tables created, ${data?.profiles_assigned ?? 0} profiles assigned`);
+      const tables = data?.tables_created ?? 0;
+      const invitations = data?.invitations_created ?? 0;
+      const assigned = data?.profiles_assigned ?? 0;
+      setAssignResult(
+        `Done: ${tables} tables created, ${assigned} profiles assigned, ${invitations} invitations created`
+      );
       const { data: refreshed } = await supabase
         .from("profiles")
         .select("id, email, handle, why, pillar, filters, stack, table_id, created_at")
@@ -206,7 +244,31 @@ const Admin = () => {
             <h1 className="gallery-heading text-3xl font-semibold">Admin</h1>
             <p className="gallery-label mt-2">{profiles.length} signups</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+              <SelectTrigger className="w-64 rounded-none border-border bg-background font-body text-xs uppercase tracking-[0.15em] text-foreground focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:border-primary data-[placeholder]:text-muted-foreground">
+                <SelectValue placeholder="Select event" />
+              </SelectTrigger>
+              <SelectContent className="rounded-none border-border bg-background text-foreground">
+                {events.map((ev) => (
+                  <SelectItem
+                    key={ev.id}
+                    value={ev.id}
+                    className="font-body text-xs uppercase tracking-[0.1em] focus:bg-primary/10 focus:text-primary"
+                  >
+                    {ev.title}
+                    {ev.date
+                      ? ` — ${new Date(ev.date).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}`
+                      : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <button
               onClick={triggerAssignTables}
               disabled={assigning}
