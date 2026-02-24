@@ -71,7 +71,7 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut, userId }: Props) => {
 
   if (!event) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
+      <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
         <span className="gallery-micro animate-pulse">Loading event…</span>
       </div>
     );
@@ -81,8 +81,8 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut, userId }: Props) => {
   const calendarUrl = buildCalendarUrl(event);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
-      <div className="w-full max-w-lg space-y-14 animate-fade-up text-center">
+    <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
+      <div className="w-full max-w-lg space-y-8 sm:space-y-14 animate-fade-up text-center">
         {/* Status Badge */}
         <div className="space-y-8">
           <span className="inline-flex items-center gap-2 border border-primary px-5 py-2 gallery-micro text-primary animate-fade-up">

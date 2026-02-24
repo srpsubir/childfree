@@ -26,7 +26,7 @@ const WhyScreen = ({ onNext }: Props) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 1</p>

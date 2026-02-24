@@ -64,7 +64,7 @@ const VerificationScreen = ({ userId, onVerified }: Props) => {
   };
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
+    <section className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-6 pt-20 sm:pt-16 pb-10 sm:pb-16">
       <h1 className="gallery-heading mb-3 text-center">Prove You're Real.</h1>
       <p className="gallery-body text-muted-foreground mb-10 max-w-sm text-center">
         One photo. No filters. This is how trust begins.
