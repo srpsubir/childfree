@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   matchCount?: number | null;
+  verified?: boolean;
   onSignOut?: () => void;
 }
 
@@ -24,7 +25,7 @@ function formatDate(iso: string) {
   };
 }
 
-const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
+const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
   const navigate = useNavigate();
   const [event, setEvent] = useState<{
     title: string; date: string; venue: string; address: string; maps_link: string | null; max_seats: number;
@@ -63,6 +64,13 @@ const OutcomeScreen = ({ matchCount, onSignOut }: Props) => {
             <span className="w-1.5 h-1.5 bg-primary" />
             Seat Confirmed
           </span>
+
+          {verified && (
+            <span className="inline-flex items-center gap-1.5 gallery-micro text-primary animate-fade-up">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+              Identity Verified
+            </span>
+          )}
 
           <h2 className="gallery-heading text-4xl md:text-5xl font-semibold text-foreground">
             {event.title.replace("Kindred — ", "")}
