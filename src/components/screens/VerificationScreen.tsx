@@ -89,7 +89,7 @@ const VerificationScreen = ({ userId, onVerified }: Props) => {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="w-64 h-64 border border-primary/20 flex flex-col items-center justify-center gap-3 transition-colors hover:border-primary/50 mb-8 overflow-hidden"
+            className="w-48 h-48 md:w-64 md:h-64 border border-primary/20 flex flex-col items-center justify-center gap-3 transition-colors hover:border-primary/50 mb-8 overflow-hidden"
           >
             {preview ? (
               <img src={preview} alt="Selfie preview" className="w-full h-full object-cover" />

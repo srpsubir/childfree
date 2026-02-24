@@ -46,7 +46,7 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
 
   if (!event) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+      <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
         <span className="gallery-micro animate-pulse">Loading event…</span>
       </div>
     );
@@ -56,7 +56,7 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
   const calendarUrl = buildCalendarUrl(event);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
       <div className="w-full max-w-lg space-y-14 animate-fade-up text-center">
         {/* Status Badge */}
         <div className="space-y-8">
@@ -72,7 +72,7 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
             </span>
           )}
 
-          <h2 className="gallery-heading text-4xl md:text-5xl font-semibold text-foreground">
+          <h2 className="gallery-heading text-2xl md:text-4xl font-semibold text-foreground">
             {event.title.replace("Kindred — ", "")}
           </h2>
 
@@ -82,7 +82,7 @@ const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
         </div>
 
         {/* Invitation Card */}
-        <div className="border border-border bg-card p-10 space-y-0 text-left animate-fade-up-delay">
+        <div className="border border-border bg-card p-6 md:p-10 space-y-0 text-left animate-fade-up-delay">
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />

@@ -25,7 +25,7 @@ const FilterScreen = ({ onNext }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 3</p>
