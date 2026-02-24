@@ -128,6 +128,8 @@ export type Database = {
           stack: string[] | null
           table_id: string | null
           user_id: string | null
+          verified: boolean
+          verified_at: string | null
           why: string | null
         }
         Insert: {
@@ -142,6 +144,8 @@ export type Database = {
           stack?: string[] | null
           table_id?: string | null
           user_id?: string | null
+          verified?: boolean
+          verified_at?: string | null
           why?: string | null
         }
         Update: {
@@ -156,6 +160,8 @@ export type Database = {
           stack?: string[] | null
           table_id?: string | null
           user_id?: string | null
+          verified?: boolean
+          verified_at?: string | null
           why?: string | null
         }
         Relationships: [

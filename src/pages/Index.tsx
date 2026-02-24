@@ -9,8 +9,9 @@ import FilterScreen from "@/components/screens/FilterScreen";
 import StackScreen from "@/components/screens/StackScreen";
 import PulseScreen from "@/components/screens/PulseScreen";
 import OutcomeScreen from "@/components/screens/OutcomeScreen";
+import VerificationScreen from "@/components/screens/VerificationScreen";
 
-type Screen = "landing" | "auth" | "why" | "pillar" | "filter" | "stack" | "pulse" | "outcome";
+type Screen = "landing" | "auth" | "why" | "pillar" | "filter" | "stack" | "verify" | "pulse" | "outcome";
 
 const BackButton = ({ onClick }: { onClick: () => void }) => (
   <button
@@ -43,7 +44,7 @@ const Index = () => {
     setCheckingProfile(true);
     supabase
       .from("profiles")
-      .select("why, pillar, filters, stack, table_id")
+      .select("why, pillar, filters, stack, table_id, verified")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
@@ -116,11 +117,15 @@ const Index = () => {
         )}
         {screen === "stack" && (
           <><BackButton onClick={() => goTo("filter")} />
-          <StackScreen onNext={(s) => { setStack(s); user ? goTo("pulse") : goTo("auth"); }} /></>
+          <StackScreen onNext={(s) => { setStack(s); user ? goTo("verify") : goTo("auth"); }} /></>
         )}
         {screen === "auth" && (
           <><BackButton onClick={() => goTo("stack")} />
-          <AuthGate onAuthenticated={() => goTo("pulse")} /></>
+          <AuthGate onAuthenticated={() => goTo("verify")} /></>
+        )}
+        {screen === "verify" && user && (
+          <><BackButton onClick={() => goTo("auth")} />
+          <VerificationScreen userId={user.id} onVerified={() => goTo("pulse")} /></>
         )}
         {screen === "pulse" && (
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
