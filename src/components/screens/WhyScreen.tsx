@@ -26,7 +26,7 @@ const WhyScreen = ({ onNext }: Props) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 1</p>
@@ -43,7 +43,7 @@ const WhyScreen = ({ onNext }: Props) => {
             <button
               key={o.id}
               onClick={() => setSelected(o.id)}
-              className={`editorial-card w-full p-8 text-left ${
+              className={`editorial-card w-full p-6 md:p-8 text-left ${
                 selected === o.id ? "selected" : "hover:border-muted-foreground/30"
               }`}
             >

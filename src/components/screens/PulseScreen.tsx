@@ -21,7 +21,7 @@ const PulseScreen = ({ onNext }: Props) => {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
       <div className="relative flex items-center justify-center">
         {[0, 1, 2].map((i) => (
           <div

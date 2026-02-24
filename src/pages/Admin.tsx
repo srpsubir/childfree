@@ -290,7 +290,7 @@ const Admin = () => {
           <p className="gallery-label animate-pulse">Loading profiles…</p>
         ) : (
           <div className="overflow-x-auto border border-border">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[640px] text-left">
               <thead>
                 <tr className="border-b border-border">
                   {["Email", "Why", "Pillar", "Filters", "Stack", "Table", "Joined"].map((h) => (

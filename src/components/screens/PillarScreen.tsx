@@ -14,7 +14,7 @@ const PillarScreen = ({ onNext }: Props) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-10 py-16">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16">
       <div className="w-full max-w-lg space-y-12 animate-fade-up">
         <div className="space-y-5 text-center">
           <p className="gallery-micro">Step 2</p>
@@ -28,7 +28,7 @@ const PillarScreen = ({ onNext }: Props) => {
             <button
               key={p.id}
               onClick={() => setSelected(p.id)}
-              className={`editorial-card w-full p-8 text-left ${
+              className={`editorial-card w-full p-6 md:p-8 text-left ${
                 selected === p.id ? "selected" : "hover:border-muted-foreground/30"
               }`}
             >
