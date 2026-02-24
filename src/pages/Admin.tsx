@@ -28,7 +28,7 @@ interface SafetyReport {
   reporter_id: string;
   reported_user_id: string;
   event_id: string | null;
-  category: "harassment" | "misrepresentation" | "boundary_violation" | "other";
+  category: string;
   description: string;
   status: string;
   created_at: string;
@@ -149,7 +149,7 @@ const Admin = () => {
 
     const [profileRes, eventRes] = await Promise.all([
       userIds.length > 0
-        ? supabase.from("profiles").select("id, handle, email").in("id", userIds)
+        ? supabase.from("profiles").select("id, user_id, handle, email").in("user_id", userIds)
         : Promise.resolve({ data: [] }),
       eventIds.length > 0
         ? supabase.from("events").select("id, title").in("id", eventIds)
@@ -158,7 +158,7 @@ const Admin = () => {
 
     const profileMap: Record<string, string | null> = {};
     for (const p of profileRes.data ?? []) {
-      profileMap[p.id] = p.handle || p.email || null;
+      if (p.user_id) profileMap[p.user_id] = p.handle || p.email || null;
     }
 
     const eventMap: Record<string, string | null> = {};
@@ -244,9 +244,9 @@ const Admin = () => {
             <h1 className="gallery-heading text-3xl font-semibold">Admin</h1>
             <p className="gallery-label mt-2">{profiles.length} signups</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Select value={selectedEventId} onValueChange={setSelectedEventId}>
-              <SelectTrigger className="w-64 rounded-none border-border bg-background font-body text-xs uppercase tracking-[0.15em] text-foreground focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:border-primary data-[placeholder]:text-muted-foreground">
+              <SelectTrigger className="w-full sm:w-64 rounded-none border-border bg-background font-body text-xs uppercase tracking-[0.15em] text-foreground focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:border-primary data-[placeholder]:text-muted-foreground">
                 <SelectValue placeholder="Select event" />
               </SelectTrigger>
               <SelectContent className="rounded-none border-border bg-background text-foreground">
