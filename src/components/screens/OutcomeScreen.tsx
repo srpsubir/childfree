@@ -7,6 +7,7 @@ interface Props {
   matchCount?: number | null;
   verified?: boolean;
   onSignOut?: () => void;
+  userId?: string;
 }
 
 function buildCalendarUrl(event: { title: string; date: string; venue: string; address: string; maps_link: string | null }) {
@@ -25,24 +26,48 @@ function formatDate(iso: string) {
   };
 }
 
-const OutcomeScreen = ({ matchCount, verified, onSignOut }: Props) => {
+const OutcomeScreen = ({ matchCount, verified, onSignOut, userId }: Props) => {
   const navigate = useNavigate();
   const [event, setEvent] = useState<{
     title: string; date: string; venue: string; address: string; maps_link: string | null; max_seats: number;
   } | null>(null);
 
   useEffect(() => {
-    supabase
-      .from("events")
-      .select("title, date, venue, address, maps_link, max_seats")
-      .eq("status", "upcoming")
-      .order("date", { ascending: true })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setEvent(data);
-      });
-  }, []);
+    const fetchFallback = () => {
+      supabase
+        .from("events")
+        .select("title, date, venue, address, maps_link, max_seats")
+        .eq("status", "upcoming")
+        .order("date", { ascending: true })
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) setEvent(data);
+        });
+    };
+
+    if (userId) {
+      supabase
+        .from("invitations")
+        .select("events(title, date, venue, address, maps_link, max_seats)")
+        .eq("user_id", userId)
+        .order("date", { foreignTable: "events", ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => {
+          const ev = data?.events as {
+            title: string; date: string; venue: string; address: string; maps_link: string | null; max_seats: number;
+          } | null;
+          if (ev) {
+            setEvent(ev);
+          } else {
+            fetchFallback();
+          }
+        });
+    } else {
+      fetchFallback();
+    }
+  }, [userId]);
 
   if (!event) {
     return (

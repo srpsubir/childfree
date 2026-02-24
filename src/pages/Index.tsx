@@ -137,7 +137,7 @@ const Index = () => {
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
         )}
         {screen === "outcome" && (
-          <OutcomeScreen matchCount={matchCount} verified={verified} onSignOut={handleSignOut} />
+          <OutcomeScreen matchCount={matchCount} verified={verified} onSignOut={handleSignOut} userId={user?.id} />
         )}
       </div>
     </div>
