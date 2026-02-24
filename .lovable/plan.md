@@ -1,47 +1,34 @@
 
 
-# Add Verified Badge to Outcome Screen
+# Fix: Create Database Tables and Resolve TypeScript Errors
 
-## Change
+## Root Cause
+The `safety_reports` and `connect_requests` tables were never created in the database. The generated Supabase types don't include them, causing all the TypeScript errors.
 
-Add a small verified indicator next to the "Seat Confirmed" badge on the Outcome screen. When the user's profile has `verified: true`, show a "✓ Identity Verified" micro-label beneath the status badge, using the existing `gallery-micro` style with `text-primary` color to match the design language.
+## Step 1: Database Migration
+Create both tables with RLS policies:
 
-## Implementation
+**`safety_reports`** — reporter_id, reported_user_id, event_id, category, description, status, unique constraint on (reporter_id, reported_user_id, event_id). RLS: users insert/select own, admins select/update, no delete.
 
-### `src/components/screens/OutcomeScreen.tsx`
+**`connect_requests`** — requester_id, target_id, event_id, unique constraint on (requester_id, target_id, event_id). RLS: users insert own, select where requester or target, admins select, no update/delete.
 
-1. Add a `verified` prop to the `Props` interface:
-   ```ts
-   interface Props {
-     matchCount?: number | null;
-     verified?: boolean;
-     onSignOut?: () => void;
-   }
-   ```
+## Step 2: Fix TypeScript in 3 Files
+After migration, the types file auto-regenerates. But to be safe and handle the interim, cast the supabase `.from()` calls using `as any` for the new table names in:
 
-2. Below the "Seat Confirmed" badge (line ~73), conditionally render:
-   ```tsx
-   {verified && (
-     <span className="inline-flex items-center gap-1.5 gallery-micro text-primary">
-       <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-       Identity Verified
-     </span>
-   )}
-   ```
+| File | Lines | Fix |
+|---|---|---|
+| `src/components/SafetyReportDialog.tsx` | 78 | `supabase.from("safety_reports" as any)` |
+| `src/components/MutualConnectDialog.tsx` | 43 | `supabase.from("connect_requests" as any)` |
+| `src/pages/Account.tsx` | 116-134 | Cast all `.from("safety_reports"/"connect_requests")` calls and data arrays with `as any` |
 
-### `src/pages/Index.tsx`
+Once the types regenerate after migration, the `as any` casts can be removed.
 
-Pass the `verified` state from the profile data down to `OutcomeScreen`:
-```tsx
-<OutcomeScreen matchCount={matchCount} verified={profile?.verified} onSignOut={signOut} />
-```
-
-This requires storing the profile's `verified` field in state, which is already selected in the profile query.
-
-### Files changed
+## Files Changed
 
 | File | Change |
 |---|---|
-| `src/components/screens/OutcomeScreen.tsx` | Add `verified` prop, render badge |
-| `src/pages/Index.tsx` | Pass `verified` to OutcomeScreen |
+| **SQL Migration** | Create `safety_reports` and `connect_requests` tables with RLS |
+| `src/components/SafetyReportDialog.tsx` | Cast `.from()` call |
+| `src/components/MutualConnectDialog.tsx` | Cast `.from()` call |
+| `src/pages/Account.tsx` | Cast `.from()` calls and data arrays |
 
