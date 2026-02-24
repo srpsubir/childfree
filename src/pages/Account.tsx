@@ -113,19 +113,19 @@ const Account = () => {
       }
 
       // 3. Get safety reports submitted by user for past events
-      const { data: reportsData } = await (supabase.from as any)("safety_reports")
+      const { data: reportsData } = await supabase.from("safety_reports")
         .select("reported_user_id, event_id")
         .eq("reporter_id", user!.id)
         .in("event_id", pastEventIds);
 
       // 4. Get connect_requests sent by user for past events
-      const { data: sentData } = await (supabase.from as any)("connect_requests")
+      const { data: sentData } = await supabase.from("connect_requests")
         .select("target_id, event_id")
         .eq("requester_id", user!.id)
         .in("event_id", pastEventIds);
 
       // 5. Get connect_requests received by user for past events
-      const { data: receivedData } = await (supabase.from as any)("connect_requests")
+      const { data: receivedData } = await supabase.from("connect_requests")
         .select("requester_id, event_id")
         .eq("target_id", user!.id)
         .in("event_id", pastEventIds);
