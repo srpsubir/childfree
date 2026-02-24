@@ -52,6 +52,11 @@ export default function MutualConnectDialog({
     }
     toast.success("Connection request sent.");
     onRequested(targetId);
+
+    // Notify both users if this created a mutual match
+    supabase.functions.invoke("notify-mutual-match", {
+      body: { requester_id: userId, target_id: targetId, event_id: eventId },
+    }).catch((err) => console.error("notify-mutual-match error:", err));
   }
 
   return (
