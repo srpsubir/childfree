@@ -23,6 +23,7 @@ interface Props {
   tablemates: Tablemate[];
   sentRequests: string[];     // target_ids the user has already sent requests to
   receivedRequests: string[]; // requester_ids who have sent requests to this user
+  mutualEmails: Record<string, string>; // user_id -> email, only for mutual connections
   onRequested: (targetId: string) => void;
 }
 
@@ -34,6 +35,7 @@ export default function MutualConnectDialog({
   tablemates,
   sentRequests,
   receivedRequests,
+  mutualEmails,
   onRequested,
 }: Props) {
   const [pending, setPending] = useState<string[]>([]);
@@ -62,7 +64,7 @@ export default function MutualConnectDialog({
             Connect with Tablemates
           </DialogTitle>
           <DialogDescription className="gallery-body text-muted-foreground text-sm mt-1">
-            Mutual connections reveal each other's handles.
+            Mutual connections reveal each other's handle and email address.
           </DialogDescription>
         </DialogHeader>
 
@@ -87,9 +89,11 @@ export default function MutualConnectDialog({
                   {mutual ? (
                     <>
                       <p className="font-body text-sm text-foreground">@{t.handle}</p>
-                      <p className="gallery-micro text-primary uppercase tracking-[0.15em]">
-                        Mutual connection
-                      </p>
+                      {mutualEmails[t.user_id] && (
+                        <p className="font-body text-xs text-muted-foreground">
+                          {mutualEmails[t.user_id]}
+                        </p>
+                      )}
                     </>
                   ) : (
                     <p className="font-body text-sm text-muted-foreground">
@@ -125,7 +129,7 @@ export default function MutualConnectDialog({
 
         <div className="px-6 pb-6 pt-2">
           <p className="gallery-micro text-muted-foreground">
-            Handles are only revealed when both sides connect. Requests cannot be withdrawn.
+            Handles and emails are only revealed when both sides connect. Requests cannot be withdrawn.
           </p>
         </div>
       </DialogContent>

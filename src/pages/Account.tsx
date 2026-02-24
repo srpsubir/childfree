@@ -32,6 +32,7 @@ interface EventSocialData {
   reportedUserIds: string[];   // user_ids already reported by current user for this event
   sentConnectIds: string[];    // target_ids for connect_requests sent by current user
   receivedConnectIds: string[];// requester_ids for connect_requests received by current user
+  mutualEmails: Record<string, string>; // user_id -> email for mutual connections
 }
 
 function formatDate(iso: string) {
@@ -130,9 +131,19 @@ const Account = () => {
         .eq("target_id", user!.id)
         .in("event_id", pastEventIds);
 
+      // 6. Get emails for mutual connections (only revealed when both sides connected)
+      const { data: mutualEmailData } = await (supabase as any)
+        .rpc("get_mutual_connect_emails");
+
       // Build per-event social data
       const byEvent: Record<string, EventSocialData> = {};
       for (const eventId of pastEventIds) {
+        // Map user_id -> email for mutual connections in this event
+        const mutualEmails: Record<string, string> = {};
+        ((mutualEmailData ?? []) as any[])
+          .filter((r: any) => r.event_id === eventId && r.email)
+          .forEach((r: any) => { mutualEmails[r.user_id] = r.email; });
+
         byEvent[eventId] = {
           tablemates: tablemateList,
           reportedUserIds: ((reportsData ?? []) as any[])
@@ -144,6 +155,7 @@ const Account = () => {
           receivedConnectIds: ((receivedData ?? []) as any[])
             .filter((r: any) => r.event_id === eventId)
             .map((r: any) => r.requester_id),
+          mutualEmails,
         };
       }
 
@@ -185,7 +197,7 @@ const Account = () => {
     setSocialData((prev) => ({
       ...prev,
       [eventId]: {
-        ...(prev[eventId] ?? { tablemates: [], sentConnectIds: [], receivedConnectIds: [], reportedUserIds: [] }),
+        ...(prev[eventId] ?? { tablemates: [], sentConnectIds: [], receivedConnectIds: [], reportedUserIds: [], mutualEmails: {} }),
         reportedUserIds: [...(prev[eventId]?.reportedUserIds ?? []), reportedUserId],
       },
     }));
@@ -195,7 +207,7 @@ const Account = () => {
     setSocialData((prev) => ({
       ...prev,
       [eventId]: {
-        ...(prev[eventId] ?? { tablemates: [], reportedUserIds: [], receivedConnectIds: [], sentConnectIds: [] }),
+        ...(prev[eventId] ?? { tablemates: [], reportedUserIds: [], receivedConnectIds: [], sentConnectIds: [], mutualEmails: {} }),
         sentConnectIds: [...(prev[eventId]?.sentConnectIds ?? []), targetId],
       },
     }));
@@ -417,6 +429,7 @@ const Account = () => {
           tablemates={socialData[activeConnectEvent.events.id]?.tablemates ?? []}
           sentRequests={socialData[activeConnectEvent.events.id]?.sentConnectIds ?? []}
           receivedRequests={socialData[activeConnectEvent.events.id]?.receivedConnectIds ?? []}
+          mutualEmails={socialData[activeConnectEvent.events.id]?.mutualEmails ?? {}}
           onRequested={(targetId) => {
             handleConnectRequested(activeConnectEvent.events.id, targetId);
           }}
