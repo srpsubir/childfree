@@ -1,42 +1,92 @@
 
 
-# Feature Gap Analysis — Kindred V2.1 (Updated 2026-02-24)
+# Responsiveness Audit + Build Error Fix
 
-## Feature Status Matrix
+## Build Error (blocking)
 
-| # | Feature | Status | Notes |
-|---|---------|--------|-------|
-| 1 | Safety Report + Mutual Connect (tables, dialogs, Account UI) | ✅ Done | Build error fixed, `as any` casts removed |
-| 2 | Admin Event Selection for Table Assignment | ✅ Done | Select dropdown + event_id passing implemented |
-| 3 | Admin Safety Reports Review | ✅ Done | Table with Reviewed/Dismissed actions, profile lookup fixed to `user_id` |
-| 4 | Email Notifications for New Invitations | ✅ Done | `assign-tables` sends emails via Resend inline |
-| 5 | `send-welcome-email` dynamic event support | ✅ Done | Accepts `event` payload, falls back to default |
-| 6 | `RESEND_API_KEY` secret | ✅ Done | Configured |
-| 7 | Mobile Viewport Polish | ⚠️ Partial | Admin.tsx header made responsive (`flex-col sm:flex-row`, `w-full sm:w-64`). Other screens already OK. |
+The `assign-tables` edge function has a TypeScript error on line 375. The `sendInvitationEmail` function signature on line 211 declares `supabase: ReturnType<typeof createClient>`, but the `createClient` from `@supabase/supabase-js@2` returns a generic type that doesn't match the actual instantiated client. 
 
----
+**Fix:** Change the parameter type to `any` (consistent with the existing `// deno-lint-ignore no-explicit-any` comment on line 209):
 
-## Completed Fixes (this session)
-
-1. **Build error** — `SafetyReport.category` changed from union type to `string` in Admin.tsx
-2. **Profile lookup bug** — Changed `.in("id", userIds)` to `.in("user_id", userIds)` in Admin.tsx
-3. **`as any` casts removed** — Account.tsx now uses typed `supabase.from("safety_reports")` and `supabase.from("connect_requests")`
-4. **RESEND_API_KEY** — Secret configured and available to edge functions
-5. **Admin.tsx mobile** — Header controls wrapped in `flex-col sm:flex-row`, select changed to `w-full sm:w-64`
+```typescript
+// Line 211: change
+supabase: ReturnType<typeof createClient>,
+// to
+supabase: any,
+```
 
 ---
 
-## Remaining Gaps
+## Responsiveness Analysis
 
-### None blocking.
+I reviewed all screens at 375px (iPhone SE/13 mini). Here's what I found:
 
-All features from Memory.md are implemented and the build compiles. The only optional improvement is a full mobile audit across all screens, but individual screen review found them already responsive.
+### Screens that fit well (no issues)
+- **LandingScreen** — centered content, `px-6`, `max-w-md`, responsive text. Fits on one viewport.
+- **PulseScreen** — minimal content, centered. Fine.
+- **AuthGate** — centered, `max-w-sm`. Fine.
+- **OTPScreen** — `max-w-md`, centered. Fine.
 
----
+### Screens with scrolling issues
 
-## Optional Future Enhancements
+1. **FilterScreen** — 8 selection cards + header + button. Uses `min-h-screen` with `items-center justify-center`, which vertically centers the content. On short phones (667px like iPhone SE), 8 cards overflow the viewport and the centering pushes content up off-screen, making the top cards inaccessible or the bottom button cut off.
 
-- Full end-to-end test of email sending via `assign-tables` with a real event
-- Resend domain verification for custom "from" address (currently limited to `onboarding@resend.dev`)
-- Admin.tsx: pagination for profiles/reports if data grows large
-- Accessibility audit (focus management, aria labels)
+2. **StackScreen** — 5 cards + header + button + footer text. Same centering issue on small screens.
+
+3. **WhyScreen** — 3 cards with descriptions. Borderline on very small screens, but generally fits.
+
+4. **PillarScreen** — 3 cards with longer descriptions. Same as WhyScreen, borderline.
+
+5. **OutcomeScreen** — Badge + title + description + invitation card (3 rows) + status + CTA + footer links, all with `space-y-14`. Heavy vertical spacing causes overflow on phones. The `space-y-14` (3.5rem gaps) is excessive for mobile.
+
+6. **VerificationScreen** — Generally fits, but `px-6 py-16` uses generous vertical padding.
+
+7. **Account page** — Uses scrollable layout (`max-w-lg mx-auto px-6 py-12`), no `justify-center`. This one is fine since it's meant to scroll.
+
+### Root cause pattern
+
+The problem is `min-h-screen flex-col items-center justify-center` on content-heavy screens. When content exceeds viewport height, `justify-center` pushes the top off-screen instead of letting the user scroll from the top.
+
+### Proposed fixes
+
+**For all onboarding screens (Why, Pillar, Filter, Stack, Verification, Outcome):**
+- Change `justify-center` to `justify-start` on mobile, `justify-center` on desktop: replace with `justify-start sm:justify-center`
+- Reduce vertical padding on mobile: change `py-16` to `py-10 sm:py-16`
+- Add top padding to compensate for removing center on mobile: `pt-20 sm:pt-16`
+
+**For OutcomeScreen specifically:**
+- Reduce `space-y-14` to `space-y-8 sm:space-y-14` on mobile
+
+**For FilterScreen and StackScreen:**
+- Reduce card padding on mobile: `p-4 sm:p-5` instead of `p-5`
+
+**Screens to update (8 files):**
+
+| Screen | Changes |
+|--------|---------|
+| `WhyScreen` | `justify-start sm:justify-center`, `py-10 sm:py-16`, `pt-20 sm:pt-16` |
+| `PillarScreen` | Same pattern |
+| `FilterScreen` | Same pattern + smaller card padding on mobile |
+| `StackScreen` | Same pattern + smaller card padding on mobile |
+| `VerificationScreen` | Same pattern |
+| `OutcomeScreen` | Same pattern + reduce `space-y-14` to `space-y-8 sm:space-y-14` |
+| `LandingScreen` | Same pattern (preventative) |
+| `AuthGate` | Same pattern (preventative) |
+| `AuditScreen` | Change `px-10` to `px-6 md:px-10` (currently missing mobile padding reduction) |
+
+**Edge function fix (1 file):**
+
+| File | Change |
+|------|--------|
+| `assign-tables/index.ts` line 211 | Change parameter type to `any` |
+
+### Technical detail
+
+The core CSS change on each screen wrapper is:
+```
+- className="flex min-h-screen flex-col items-center justify-center px-6 md:px-10 py-16"
++ className="flex min-h-screen flex-col items-center justify-start sm:justify-center px-6 md:px-10 pt-20 sm:pt-16 pb-10 sm:pb-16"
+```
+
+This ensures on mobile the content starts from the top (scrollable), while on larger screens it remains vertically centered.
+
