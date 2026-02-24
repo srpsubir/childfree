@@ -31,6 +31,7 @@ const Index = () => {
   const [stack, setStack] = useState<[string, string, string]>(["", "", ""]);
   const [fadeKey, setFadeKey] = useState(0);
   const [matchCount, setMatchCount] = useState<number | null>(null);
+  const [verified, setVerified] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(false);
 
   const goTo = useCallback((s: Screen) => {
@@ -53,6 +54,7 @@ const Index = () => {
           setPillar(data.pillar ?? "");
           setFilters(data.filters ?? []);
           setStack((data.stack as [string, string, string]) ?? ["", "", ""]);
+          setVerified(!!data.verified);
           if (data.verified) {
             goTo("outcome");
           } else {
@@ -135,7 +137,7 @@ const Index = () => {
           <PulseScreen onNext={() => { saveProfileAndMatch(); goTo("outcome"); }} />
         )}
         {screen === "outcome" && (
-          <OutcomeScreen matchCount={matchCount} onSignOut={handleSignOut} />
+          <OutcomeScreen matchCount={matchCount} verified={verified} onSignOut={handleSignOut} />
         )}
       </div>
     </div>
