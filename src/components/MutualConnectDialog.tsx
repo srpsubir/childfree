@@ -40,7 +40,7 @@ export default function MutualConnectDialog({
 
   async function handleConnect(targetId: string) {
     setPending((p) => [...p, targetId]);
-    const { error } = await supabase.from("connect_requests").insert({
+    const { error } = await (supabase.from as any)("connect_requests").insert({
       requester_id: userId,
       target_id: targetId,
       event_id: eventId,
